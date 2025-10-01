@@ -127,5 +127,57 @@
   <div id="toast" class="toast"></div>
 
   <script type="module" src="./js/boot.js"></script>
+  
+  <!-- Emergency button fix script -->
+  <script>
+    console.log('Emergency script loaded');
+    
+    // Test canvas pointer events immediately
+    const canvas = document.getElementById('game');
+    if (canvas) {
+      const canvasStyle = window.getComputedStyle(canvas);
+      console.log('Canvas pointer-events:', canvasStyle.pointerEvents);
+      console.log('Canvas z-index:', canvasStyle.zIndex);
+    }
+    
+    // Wait for everything to load
+    window.addEventListener('load', () => {
+      console.log('Window loaded, setting up emergency handlers');
+      
+      // Test if we can find buttons
+      const startBtn = document.getElementById('btnStartGame');
+      const pauseBtn = document.getElementById('btnPause');
+      
+      console.log('Start button:', startBtn);
+      console.log('Pause button:', pauseBtn);
+      
+      // Check computed styles
+      if (startBtn) {
+        const style = window.getComputedStyle(startBtn);
+        console.log('Start button pointer-events:', style.pointerEvents);
+        console.log('Start button z-index:', style.zIndex);
+        startBtn.style.outline = '3px solid red';
+        startBtn.style.position = 'relative';
+        startBtn.style.zIndex = '99999';
+      }
+      
+      if (pauseBtn) {
+        const style = window.getComputedStyle(pauseBtn);
+        console.log('Pause button pointer-events:', style.pointerEvents);
+        console.log('Pause button z-index:', style.zIndex);
+        pauseBtn.style.outline = '3px solid green';
+        pauseBtn.style.position = 'relative';
+        pauseBtn.style.zIndex = '99999';
+      }
+      
+      // Check menu z-index
+      const menu = document.getElementById('menu');
+      if (menu) {
+        const menuStyle = window.getComputedStyle(menu);
+        console.log('Menu z-index:', menuStyle.zIndex);
+        console.log('Menu pointer-events:', menuStyle.pointerEvents);
+      }
+    });
+  </script>
 </body>
 </html>
