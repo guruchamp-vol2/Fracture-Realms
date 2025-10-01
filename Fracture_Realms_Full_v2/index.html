@@ -8,43 +8,44 @@
 </head>
 <body>
   <div id="app">
+    <!-- Canvas sits at z-index:0 so it never blocks clicks -->
     <canvas id="game"></canvas>
 
-    <!-- Global UI -->
+    <!-- Toast layer -->
     <div id="ui" class="layer">
       <div id="toast"></div>
     </div>
 
-    <!-- Scene: Main Menu -->
+    <!-- MENU -->
     <div id="menu" class="scene active">
       <div class="card">
         <h1>⚔️ Fracture Realms</h1>
         <p class="muted">Action Reboot • Skill-based arenas • Many worlds</p>
         <div class="row">
-          <button id="btnPlay" class="btn">▶ Start Campaign</button>
-          <button id="btnArcade" class="btn">∞ Endless</button>
+          <button id="btnPlay" class="btn" type="button">▶ Start Campaign</button>
+          <button id="btnArcade" class="btn" type="button">∞ Endless</button>
         </div>
         <div class="row">
-          <button id="btnOptions" class="btn ghost">⚙ Options</button>
-          <button id="btnCredits" class="btn ghost">★ Credits</button>
+          <button id="btnOptions" class="btn ghost" type="button">⚙ Options</button>
+          <button id="btnCredits" class="btn ghost" type="button">★ Credits</button>
         </div>
-        <div class="row small muted">Build v2.0 — runs offline in any modern browser</div>
+        <div class="row small muted">Build v2.0+ — runs offline in any modern browser</div>
       </div>
     </div>
 
-    <!-- Scene: World Map -->
+    <!-- WORLD MAP -->
     <div id="worldmap" class="scene hidden">
       <div class="card wide">
         <h2>World Map</h2>
         <div id="mapGrid" class="map-grid"></div>
         <div class="row">
-          <button id="btnMapBack" class="btn ghost">← Back</button>
-          <button id="btnEnterRealm" class="btn">Enter Realm</button>
+          <button id="btnMapBack" class="btn ghost" type="button">← Back</button>
+          <button id="btnEnterRealm" class="btn" type="button">Enter Realm</button>
         </div>
       </div>
     </div>
 
-    <!-- Scene: In-Game HUD -->
+    <!-- HUD -->
     <div id="hud" class="scene hidden">
       <div id="topbar">
         <div class="chip" id="chipRealm">Realm: —</div>
@@ -53,7 +54,7 @@
         <div class="chip" id="chipCombo">Combo: 0</div>
         <div class="chip" id="chipShards">Shards: 0</div>
         <div class="chip" id="chipBoss">Boss: —</div>
-        <button id="btnPause" class="btn">⏸</button>
+        <button id="btnPause" class="btn" type="button">⏸</button>
       </div>
 
       <div id="leftpanels">
@@ -67,7 +68,6 @@
             <p><b>Goal:</b> Master movement + combat in hazardous, rule-bending realms.</p>
             <p><b>Controls:</b> <kbd>A/D</kbd> move, <kbd>W</kbd> jump (double), <kbd>J</kbd> melee, <kbd>K</kbd> magic, <kbd>L</kbd> dash,
             <kbd>E</kbd> grapple to cursor, <kbd>U</kbd> upgrades, <kbd>1..3</kbd> switch styles, <kbd>P</kbd> pause.</p>
-            <p><b>Gamepad:</b> LS move, A jump, X melee, B dash, Y magic, RB grapple, Start pause.</p>
           </div>
         </div>
       </div>
@@ -82,9 +82,9 @@
         <div class="modal-card">
           <h2>Paused</h2>
           <div class="row">
-            <button id="btnResume" class="btn">Resume</button>
-            <button id="btnRestartRealm" class="btn">Restart Realm</button>
-            <button id="btnNextRealm" class="btn">Next Realm</button>
+            <button id="btnResume" class="btn" type="button">Resume</button>
+            <button id="btnRestartRealm" class="btn" type="button">Restart Realm</button>
+            <button id="btnNextRealm" class="btn" type="button">Next Realm</button>
           </div>
           <div class="row">
             <label><input type="checkbox" id="chkScreenShake" checked> Screen shake</label>
@@ -95,31 +95,29 @@
       </div>
     </div>
 
-    <!-- Scene: Credits/Options -->
+    <!-- OPTIONS -->
     <div id="options" class="scene hidden">
       <div class="card">
         <h2>Options</h2>
         <label><input type="checkbox" id="optGamepad" checked> Enable Gamepad</label>
         <label><input type="checkbox" id="optMusic"> Procedural Music (beta)</label>
         <div class="row">
-          <button id="btnOptBack" class="btn ghost">← Back</button>
+          <button id="btnOptBack" class="btn ghost" type="button">← Back</button>
         </div>
       </div>
     </div>
 
+    <!-- CREDITS -->
     <div id="credits" class="scene hidden">
       <div class="card">
         <h2>Credits</h2>
         <p>Design & Code: You + AI. Audio: WebAudio synth. No external assets.</p>
-        <div class="row"><button id="btnCredsBack" class="btn ghost">← Back</button></div>
+        <div class="row"><button id="btnCredsBack" class="btn ghost" type="button">← Back</button></div>
       </div>
     </div>
   </div>
 
-  <script type="module">
-    import { Boot } from './js/boot.js';
-    const boot = new Boot();
-    window._boot = boot;
-  </script>
+  <!-- Autostarts Boot; no inline code needed -->
+  <script type="module" src="./js/boot.js"></script>
 </body>
 </html>
