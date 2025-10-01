@@ -1,4 +1,4 @@
-// Fracture_Realms_Full_v2/js/game.js  — FULL FILE
+// Fracture_Realms_Full_v2/js/game.js  — FULL FILE (patched)
 
 import { AudioBus } from './sound.js';
 import { makeBosses } from './modules/bosses.js';
@@ -95,7 +95,16 @@ export class Game {
       chkShake:$('#chkScreenShake'), chkParticles:$('#chkParticles'), chkAssist:$('#chkAssist')
     };
 
-    // Bind handlers safely
+    // helper: consistent show/hide even if CSS .hidden is missing
+    const hideEl=(el,hide)=>{
+      if(!el) return;
+      el.classList.toggle('hidden', hide);
+      el.style.display = hide ? 'none' : '';
+      el.setAttribute('aria-hidden', hide ? 'true' : 'false');
+    };
+    this._hideEl = hideEl;
+
+    // Bind handlers (ids might not exist — all optional)
     this.ui.btnPause?.addEventListener('click', ()=>this.togglePause());
     this.ui.btnResume?.addEventListener('click', ()=>this.togglePause(false));
     this.ui.btnRestart?.addEventListener('click', ()=>this.restartRealm());
@@ -103,6 +112,21 @@ export class Game {
     this.ui.chkShake?.addEventListener('change', (e)=> this.screenShake = e.target.checked);
     this.ui.chkParticles?.addEventListener('change', (e)=> this.particlesOn = e.target.checked);
     this.ui.chkAssist?.addEventListener('change', (e)=>{ this.assist = e.target.checked; this.restartRealm(); });
+
+    // Also wire any "Open Upgrades" / "Close" buttons by text (fallback)
+    document.addEventListener('click', (e)=>{
+      const t=e.target;
+      const txt=(t.textContent||'').toLowerCase().trim();
+      if(txt.startsWith('open upgrades')) this.toggleUp(true);
+      if(this.ui.panelUp && this.ui.panelUp.contains(t) && txt.startsWith('close')) this.toggleUp(false);
+    });
+    // Try to find a specific "Close" button inside the panel and bind it
+    const tryBindClose=()=>{
+      const p=this.ui.panelUp; if(!p) return;
+      const c=[...p.querySelectorAll('button,[role="button"],.btn')].find(b=> (b.textContent||'').toLowerCase().includes('close'));
+      c?.addEventListener('click', ()=>this.toggleUp(false));
+    };
+    tryBindClose();
 
     // Systems
     this.audio = new AudioBus();
@@ -134,10 +158,10 @@ export class Game {
       this.MOD.timePulseEvery = (this.world.modifiers.timePulse||8)*1000;
     }
 
-    // Start unpaused; make sure overlays are hidden
+    // Start unpaused and ensure overlays are hidden
     this.paused=false;
-    this.ui.pause?.classList.add('hidden');
-    this.ui.panelUp?.classList.add('hidden');
+    hideEl(this.ui.pause, true);
+    hideEl(this.ui.panelUp, true);
 
     // Init world & loop
     this.addArena(); this.spawnWave(4);
@@ -156,14 +180,14 @@ export class Game {
 
   // --- UI helpers ---
   toggleUp(force){
-    const show = force===undefined ? this.ui.panelUp?.classList.contains('hidden') : force;
-    this.ui.panelUp?.classList.toggle('hidden', !show);
+    const show = force===undefined ? (this.ui.panelUp?.style.display==='none' || this.ui.panelUp?.classList.contains('hidden')) : force;
+    this._hideEl(this.ui.panelUp, !show);
     if(show) this.renderUpgradePanel();
   }
   togglePause(force){
     const show = force===undefined ? !this.paused : force;
     this.paused = show;
-    this.ui.pause?.classList.toggle('hidden', !show);
+    this._hideEl(this.ui.pause, !show);
   }
   log(msg, cls=''){
     if(!this.ui.log) return;
@@ -199,7 +223,7 @@ export class Game {
       if(u.id==='aerialCombo'){ this.players.forEach(p=>p.airDmg=1.3);}
       if(u.id==='grappleBoost'){ this.players.forEach(p=>p.grappleBoost=true);}
       if(u.id==='styleSwitch'){ this.players.forEach(p=>p.canSwitch=true);}
-      this.campaign?.addShards(0);
+      this.campaign?.addShards?.(0);
       list.querySelectorAll('.buy').forEach(b=>b.disabled=false);
       this.renderUpgradePanel();
       this.log('Upgrade: '+u.id,'ok');
@@ -234,7 +258,23 @@ export class Game {
       this.enemies.push(new Enemy(rand(80,this.W-80), rand(60, this.H*0.4), t));
     }
   }
-  spawnBoss(){ if(!this.boss) this.boss = this.bosses.pick(this.world?.boss); }
+  spawnBoss(){
+    if(this.boss) return;
+    const b = this.bosses.pick(this.world?.boss);
+    const p = this.players[0];
+
+    // Reposition boss so it doesn't spawn on top of the player
+    let tries=0;
+    while(tries++<40){
+      b.pos.x = rand(120, this.W-120);
+      b.pos.y = rand(80, this.H*0.45);
+      const farEnough = Math.abs(b.pos.x - p.pos.x) > 220;
+      if(farEnough && !this.rectsOverlap(b.rect(), p.rect())) break;
+    }
+
+    this.boss = b;
+    this.log(`${b.name} enters the realm!`);
+  }
 
   // --- Collision ---
   rectsOverlap(a,b){ return a.x<b.x+b.w && a.x+a.w>b.x && a.y<b.y+b.h && a.y+a.h>b.y; }
