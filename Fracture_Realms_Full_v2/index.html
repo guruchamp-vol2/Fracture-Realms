@@ -16,16 +16,43 @@
   <!-- Menu Scene -->
   <div id="menu" class="scene active">
     <div class="card wide">
-      <h1>Fracture Realms</h1>
-      <p>Welcome! Click below to start your adventure.</p>
-      <button id="btnStartGame" class="btn primary">Start Game</button>
+      <h1>⚔️ Fracture Realms</h1>
+      <p class="subtitle">A fast-paced action platformer with gravity flips, time warps, and epic boss battles.</p>
+      
+      <div class="controls-section">
+        <h3>🎮 Controls</h3>
+        <div class="controls-grid">
+          <div class="control-item"><kbd>A</kbd> <kbd>D</kbd> Move</div>
+          <div class="control-item"><kbd>W</kbd> Jump (double)</div>
+          <div class="control-item"><kbd>J</kbd> Melee Attack</div>
+          <div class="control-item"><kbd>K</kbd> Magic Attack</div>
+          <div class="control-item"><kbd>L</kbd> Dash</div>
+          <div class="control-item"><kbd>E</kbd> Grapple</div>
+          <div class="control-item"><kbd>U</kbd> Upgrades</div>
+          <div class="control-item"><kbd>P</kbd> Pause</div>
+        </div>
+        <p class="tip">💡 Gamepad supported: Left Stick + A/B/X/Y buttons</p>
+      </div>
+
+      <div class="features-section">
+        <h3>✨ Features</h3>
+        <ul>
+          <li>8 unique worlds with distinct themes and modifiers</li>
+          <li>4 challenging bosses with unique mechanics</li>
+          <li>Upgradeable abilities and combat styles</li>
+          <li>Dynamic gravity flips and time manipulation</li>
+          <li>Autosave progression in localStorage</li>
+        </ul>
+      </div>
+
+      <button id="btnStartGame" class="btn primary large">Start Game</button>
     </div>
   </div>
 
   <canvas id="game" aria-label="Fracture Realms canvas"></canvas>
 
   <!-- Top HUD Chips -->
-  <div id="hud" class="ui">
+  <div id="hud" class="ui hidden">
     <div class="chips">
       <span id="chipRealm" class="chip">Realm: —</span>
       <span id="chipGrav" class="chip">Gravity: ↓</span>
@@ -82,13 +109,16 @@
   </div>
 
   <!-- Event Log -->
-  <div id="logWrap" class="ui logwrap">
+  <div id="logWrap" class="ui logwrap hidden">
     <div class="row between">
       <strong>Event Log</strong>
-      <button class="btn ghost" onclick="document.getElementById('log').innerHTML=''">Clear</button>
+      <button class="btn ghost" id="btnClearLog">Clear</button>
     </div>
     <div id="log" class="log"></div>
   </div>
+
+  <!-- Toast notifications -->
+  <div id="toast" class="toast"></div>
 
   <script type="module" src="./js/boot.js"></script>
 </body>

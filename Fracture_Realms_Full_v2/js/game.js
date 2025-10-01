@@ -107,14 +107,51 @@ export class Game {
     };
     this._hideEl = hideEl;
 
-    // Buttons
-    this.ui.btnPause?.addEventListener('click', ()=>this.togglePause());
-    this.ui.btnResume?.addEventListener('click', ()=>this.togglePause(false));
-    this.ui.btnRestart?.addEventListener('click', ()=>this.restartRealm());
-    this.ui.btnNext?.addEventListener('click', ()=>this.nextRealm());
-    this.ui.chkShake?.addEventListener('change', (e)=> this.screenShake = e.target.checked);
-    this.ui.chkParticles?.addEventListener('change', (e)=> this.particlesOn = e.target.checked);
-    this.ui.chkAssist?.addEventListener('change', (e)=>{ this.assist = e.target.checked; this.restartRealm(); });
+    // Buttons with proper event handling
+    if (this.ui.btnPause) {
+      this.ui.btnPause.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.togglePause();
+      });
+    }
+    if (this.ui.btnResume) {
+      this.ui.btnResume.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.togglePause(false);
+      });
+    }
+    if (this.ui.btnRestart) {
+      this.ui.btnRestart.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.restartRealm();
+      });
+    }
+    if (this.ui.btnNext) {
+      this.ui.btnNext.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.nextRealm();
+      });
+    }
+    if (this.ui.chkShake) {
+      this.ui.chkShake.addEventListener('change', (e) => {
+        this.screenShake = e.target.checked;
+      });
+    }
+    if (this.ui.chkParticles) {
+      this.ui.chkParticles.addEventListener('change', (e) => {
+        this.particlesOn = e.target.checked;
+      });
+    }
+    if (this.ui.chkAssist) {
+      this.ui.chkAssist.addEventListener('change', (e) => {
+        this.assist = e.target.checked;
+        this.restartRealm();
+      });
+    }
 
     // Fallback "Open Upgrades"/"Close"
     document.addEventListener('click', (e)=>{
