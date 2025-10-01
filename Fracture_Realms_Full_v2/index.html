@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>⚔️ Fracture Realms — Full Build</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <canvas id="game"></canvas>
+
+    <!-- Global UI -->
+    <div id="ui" class="layer">
+      <div id="toast"></div>
+    </div>
+
+    <!-- Scene: Main Menu -->
+    <div id="menu" class="scene active">
+      <div class="card">
+        <h1>⚔️ Fracture Realms</h1>
+        <p class="muted">Action Reboot • Skill-based arenas • Many worlds</p>
+        <div class="row">
+          <button id="btnPlay" class="btn">▶ Start Campaign</button>
+          <button id="btnArcade" class="btn">∞ Endless</button>
+        </div>
+        <div class="row">
+          <button id="btnOptions" class="btn ghost">⚙ Options</button>
+          <button id="btnCredits" class="btn ghost">★ Credits</button>
+        </div>
+        <div class="row small muted">Build v2.0 — runs offline in any modern browser</div>
+      </div>
+    </div>
+
+    <!-- Scene: World Map -->
+    <div id="worldmap" class="scene hidden">
+      <div class="card wide">
+        <h2>World Map</h2>
+        <div id="mapGrid" class="map-grid"></div>
+        <div class="row">
+          <button id="btnMapBack" class="btn ghost">← Back</button>
+          <button id="btnEnterRealm" class="btn">Enter Realm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scene: In-Game HUD -->
+    <div id="hud" class="scene hidden">
+      <div id="topbar">
+        <div class="chip" id="chipRealm">Realm: —</div>
+        <div class="chip" id="chipGrav">Gravity: ↓</div>
+        <div class="chip" id="chipWarp">Time Warp: 1.00×</div>
+        <div class="chip" id="chipCombo">Combo: 0</div>
+        <div class="chip" id="chipShards">Shards: 0</div>
+        <div class="chip" id="chipBoss">Boss: —</div>
+        <button id="btnPause" class="btn">⏸</button>
+      </div>
+
+      <div id="leftpanels">
+        <div id="questlog" class="panel">
+          <div class="panel-title">Log</div>
+          <div id="log"></div>
+        </div>
+        <div id="codex" class="panel">
+          <div class="panel-title">Codex</div>
+          <div class="codex-body">
+            <p><b>Goal:</b> Master movement + combat in hazardous, rule-bending realms.</p>
+            <p><b>Controls:</b> <kbd>A/D</kbd> move, <kbd>W</kbd> jump (double), <kbd>J</kbd> melee, <kbd>K</kbd> magic, <kbd>L</kbd> dash,
+            <kbd>E</kbd> grapple to cursor, <kbd>U</kbd> upgrades, <kbd>1..3</kbd> switch styles, <kbd>P</kbd> pause.</p>
+            <p><b>Gamepad:</b> LS move, A jump, X melee, B dash, Y magic, RB grapple, Start pause.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="upgradePanel" class="panel hidden">
+        <div class="panel-title">Upgrades (Spend Shards)</div>
+        <div id="upgradeList"></div>
+        <div class="panel-footer">Press <kbd>U</kbd> to close. Progress autosaves.</div>
+      </div>
+
+      <div id="pauseMenu" class="modal hidden">
+        <div class="modal-card">
+          <h2>Paused</h2>
+          <div class="row">
+            <button id="btnResume" class="btn">Resume</button>
+            <button id="btnRestartRealm" class="btn">Restart Realm</button>
+            <button id="btnNextRealm" class="btn">Next Realm</button>
+          </div>
+          <div class="row">
+            <label><input type="checkbox" id="chkScreenShake" checked> Screen shake</label>
+            <label><input type="checkbox" id="chkParticles" checked> Particles</label>
+            <label><input type="checkbox" id="chkAssist"> Assist: Safer platforms</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scene: Credits/Options -->
+    <div id="options" class="scene hidden">
+      <div class="card">
+        <h2>Options</h2>
+        <label><input type="checkbox" id="optGamepad" checked> Enable Gamepad</label>
+        <label><input type="checkbox" id="optMusic"> Procedural Music (beta)</label>
+        <div class="row">
+          <button id="btnOptBack" class="btn ghost">← Back</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="credits" class="scene hidden">
+      <div class="card">
+        <h2>Credits</h2>
+        <p>Design & Code: You + AI. Audio: WebAudio synth. No external assets.</p>
+        <div class="row"><button id="btnCredsBack" class="btn ghost">← Back</button></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { Boot } from './js/boot.js';
+    const boot = new Boot();
+    window._boot = boot;
+  </script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+{
+  "worlds": [
+    {
+      "id": "genesis",
+      "name": "Genesis Expanse",
+      "realm": "Genesis Expanse",
+      "boss": "Airborne Titan",
+      "modifiers": {
+        "gravFlip": 20,
+        "timePulse": 8
+      }
+    },
+    {
+      "id": "shards",
+      "name": "Shattered Echoes",
+      "realm": "Shattered Echoes",
+      "boss": "Mirror Swarm",
+      "modifiers": {
+        "gravFlip": 18,
+        "timePulse": 7
+      }
+    },
+    {
+      "id": "chrono",
+      "name": "Chrono Gully",
+      "realm": "Chrono Gully",
+      "boss": "Chrono Warden",
+      "modifiers": {
+        "gravFlip": 22,
+        "timePulse": 6
+      }
+    },
+    {
+      "id": "ember",
+      "name": "Ember Vault",
+      "realm": "Ember Vault",
+      "boss": "Gravity Serpent",
+      "modifiers": {
+        "gravFlip": 16,
+        "timePulse": 8
+      }
+    },
+    {
+      "id": "dusk",
+      "name": "Dusk Frontier",
+      "realm": "Dusk Frontier",
+      "boss": "Airborne Titan",
+      "modifiers": {
+        "gravFlip": 24,
+        "timePulse": 9
+      }
+    },
+    {
+      "id": "rift",
+      "name": "Rift Plateau",
+      "realm": "Rift Plateau",
+      "boss": "Mirror Swarm",
+      "modifiers": {
+        "gravFlip": 15,
+        "timePulse": 7
+      }
+    },
+    {
+      "id": "glacier",
+      "name": "Glacier Chasm",
+      "realm": "Glacier Chasm",
+      "boss": "Chrono Warden",
+      "modifiers": {
+        "gravFlip": 20,
+        "timePulse": 6
+      }
+    },
+    {
+      "id": "zenith",
+      "name": "Zenith Apex",
+      "realm": "Zenith Apex",
+      "boss": "Gravity Serpent",
+      "modifiers": {
+        "gravFlip": 14,
+        "timePulse": 5
+      }
+    }
+  ]
+}
