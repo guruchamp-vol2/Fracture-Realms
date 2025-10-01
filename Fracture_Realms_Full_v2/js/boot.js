@@ -14,7 +14,13 @@ function start() {
   const startBtn = document.getElementById('btnStartGame');
   if (startBtn) {
     startBtn.addEventListener('click', () => {
+      // Hide menu, show HUD
       sceneManager.show('hud');
+      document.getElementById('menu').classList.add('hidden');
+      document.getElementById('menu').classList.remove('active');
+      document.getElementById('hud').classList.remove('hidden');
+      document.getElementById('hud').classList.add('active');
+
       const canvas = document.getElementById('game');
       game = new Game(canvas, { mode: 'campaign' });
       window.game = game;
