@@ -1,44 +1,33 @@
-import { SceneManager } from './scene_manager.js';
-import { Campaign } from './campaign.js';
+// Fracture_Realms_Full_v2/js/boot.js — FULL FILE REPLACE
+
 import { Game } from './game.js';
+import { Campaign } from './campaign.js';
+import { SceneManager } from './scene_manager.js';
 
-class Boot {
-  constructor(){
-    this.sm = new SceneManager();
-    this.campaign = new Campaign(this.sm);
-    this.game = null;
+// Ensure the DOM exists before we query elements in Game()
+window.addEventListener('DOMContentLoaded', () => {
+  const canvas = document.getElementById('game');
 
-    const $ = (id)=>document.getElementById(id);
-    // Safeguard: attach only if elements exist
-    $('#btnPlay')?.addEventListener('click', () => this.toWorldMap());
-    $('#btnArcade')?.addEventListener('click', () => this.startGame({mode:'endless'}));
-    $('#btnOptions')?.addEventListener('click', () => this.sm.show('options'));
-    $('#btnCredits')?.addEventListener('click', () => this.sm.show('credits'));
-    $('#btnOptBack')?.addEventListener('click', () => this.sm.show('menu'));
-    $('#btnCredsBack')?.addEventListener('click', () => this.sm.show('menu'));
-    $('#btnMapBack')?.addEventListener('click', () => this.sm.show('menu'));
-    $('#btnEnterRealm')?.addEventListener('click', () => this.enterSelectedWorld());
-  }
+  // Create campaign/scene manager if your files export them.
+  // (Your game.js uses optional chaining so it's safe even if these are minimal.)
+  const campaign = typeof Campaign === 'function' ? new Campaign() : undefined;
+  const sm = typeof SceneManager === 'function' ? new SceneManager() : undefined;
 
-  toWorldMap(){
-    this.campaign.renderWorldMap();
-    this.sm.show('worldmap');
-  }
-  enterSelectedWorld(){
-    const world=this.campaign.getSelectedWorld();
-    if(world) this.startGame({mode:'campaign',world});
-  }
-  startGame(opts){
-    this.sm.show('hud');
-    const canvas=document.getElementById('game');
-    this.game = new Game(canvas, opts, this.campaign, this.sm);
-  }
-}
+  // Start the game
+  const game = new Game(canvas, { mode: 'campaign' }, campaign, sm);
 
-// Auto-start once DOM is ready, so buttons are definitely present
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', () => { window._boot = new Boot(); });
-} else {
-  window._boot = new Boot();
-}
-export { Boot };
+  // Expose for console debugging
+  window.game = game;
+
+  // Keyboard shortcuts for UX
+  window.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 'p') {
+      // Toggle pause
+      game.togglePause();
+    }
+    if (e.key.toLowerCase() === 'u') {
+      // Toggle upgrades
+      game.toggleUp();
+    }
+  });
+});
