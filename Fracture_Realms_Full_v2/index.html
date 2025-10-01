@@ -45,11 +45,16 @@
         </ul>
       </div>
 
-      <button id="btnStartGame" class="btn primary large">Start Game</button>
+      <button id="btnStartGame" class="btn primary large" onclick="console.log('Inline onclick fired!')">Start Game</button>
     </div>
   </div>
 
   <canvas id="game" aria-label="Fracture Realms canvas"></canvas>
+  
+  <!-- Debug overlay -->
+  <div id="debug" style="position: fixed; top: 0; left: 0; background: rgba(255,0,0,0.8); color: white; padding: 10px; z-index: 9999; font-size: 12px; pointer-events: none;">
+    Debug: Page loaded
+  </div>
 
   <!-- Top HUD Chips -->
   <div id="hud" class="ui hidden">

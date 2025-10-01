@@ -25,7 +25,7 @@ html, body {
   overflow: hidden;
 }
 
-/* Canvas layer */
+/* Canvas layer - disabled by default to allow menu clicks */
 #game {
   position: fixed;
   inset: 0;
@@ -33,6 +33,12 @@ html, body {
   height: 100vh;
   display: block;
   z-index: 0;
+  pointer-events: none;
+}
+
+/* Enable canvas pointer events when game is running */
+body.game-active #game {
+  pointer-events: auto;
 }
 
 /* Scene management */

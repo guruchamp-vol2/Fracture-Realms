@@ -12,9 +12,14 @@ function start() {
 
   // Wait for user to click Start Game
   const startBtn = document.getElementById('btnStartGame');
+  console.log('Start button found:', startBtn);
+  
   if (startBtn) {
     startBtn.addEventListener('click', () => {
-      console.log('Start Game clicked');
+      console.log('Start Game clicked!');
+      
+      // Enable canvas pointer events
+      document.body.classList.add('game-active');
       
       // Hide menu scene
       const menuEl = document.getElementById('menu');
@@ -60,4 +65,16 @@ function start() {
   }
 }
 
-addEventListener('DOMContentLoaded', start);
+addEventListener('DOMContentLoaded', () => {
+  console.log('DOM Content Loaded');
+  console.log('Document ready state:', document.readyState);
+  start();
+});
+
+// Also try immediate execution in case DOMContentLoaded already fired
+if (document.readyState === 'loading') {
+  console.log('Document still loading, waiting for DOMContentLoaded');
+} else {
+  console.log('Document already loaded, starting immediately');
+  start();
+}

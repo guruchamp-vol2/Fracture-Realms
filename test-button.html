@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Button Test</title>
+  <style>
+    body { margin: 0; padding: 20px; font-family: Arial; }
+    #canvas { 
+      position: fixed; 
+      inset: 0; 
+      background: rgba(0,0,255,0.1); 
+      z-index: 0;
+      pointer-events: none;
+    }
+    body.game-active #canvas {
+      pointer-events: auto;
+      background: rgba(0,255,0,0.1);
+    }
+    #menu { 
+      position: fixed; 
+      inset: 0; 
+      display: grid; 
+      place-items: center; 
+      z-index: 100;
+      background: rgba(0,0,0,0.8);
+    }
+    #menu.hidden { display: none; }
+    button { 
+      padding: 20px 40px; 
+      font-size: 20px; 
+      cursor: pointer;
+      pointer-events: auto;
+    }
+    #status {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: white;
+      padding: 10px;
+      z-index: 200;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" width="800" height="600"></canvas>
+  
+  <div id="menu">
+    <button id="btnStart">Click Me!</button>
+  </div>
+  
+  <div id="status">Waiting for click...</div>
+  
+  <script>
+    console.log('Script loaded');
+    
+    const btn = document.getElementById('btnStart');
+    const menu = document.getElementById('menu');
+    const status = document.getElementById('status');
+    
+    console.log('Button:', btn);
+    console.log('Menu:', menu);
+    
+    btn.addEventListener('click', () => {
+      console.log('BUTTON CLICKED!');
+      status.textContent = 'Button clicked!';
+      document.body.classList.add('game-active');
+      menu.classList.add('hidden');
+    });
+    
+    // Test if button is clickable
+    btn.style.border = '3px solid red';
+  </script>
+</body>
+</html>
