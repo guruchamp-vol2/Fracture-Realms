@@ -1,4 +1,4 @@
-// Fracture_Realms_Full_v2/js/game.js  — FULL FILE (patched)
+// Fracture_Realms_Full_v2/js/game.js
 
 import { AudioBus } from './sound.js';
 import { makeBosses } from './modules/bosses.js';
@@ -26,8 +26,11 @@ class Platform extends Rect {
     if(this.standing){
       this.stand+=dt*1000;
       if(this.stand>this.breakAt) this.dead=true;
-    } else this.stand=Math.max(0,this.stand-dt*500);
+    } else {
+      this.stand=Math.max(0,this.stand-dt*500);
+    }
     this.standing=false;
+
     if(this.type==='moving'){
       this.vx=Math.sin(t*0.5+this.phase)*20;
       this.x+=this.vx*dt;
@@ -95,7 +98,7 @@ export class Game {
       chkShake:$('#chkScreenShake'), chkParticles:$('#chkParticles'), chkAssist:$('#chkAssist')
     };
 
-    // helper: consistent show/hide even if CSS .hidden is missing
+    // Robust hide helper
     const hideEl=(el,hide)=>{
       if(!el) return;
       el.classList.toggle('hidden', hide);
@@ -104,7 +107,7 @@ export class Game {
     };
     this._hideEl = hideEl;
 
-    // Bind handlers (ids might not exist — all optional)
+    // Buttons
     this.ui.btnPause?.addEventListener('click', ()=>this.togglePause());
     this.ui.btnResume?.addEventListener('click', ()=>this.togglePause(false));
     this.ui.btnRestart?.addEventListener('click', ()=>this.restartRealm());
@@ -113,20 +116,13 @@ export class Game {
     this.ui.chkParticles?.addEventListener('change', (e)=> this.particlesOn = e.target.checked);
     this.ui.chkAssist?.addEventListener('change', (e)=>{ this.assist = e.target.checked; this.restartRealm(); });
 
-    // Also wire any "Open Upgrades" / "Close" buttons by text (fallback)
+    // Fallback "Open Upgrades"/"Close"
     document.addEventListener('click', (e)=>{
       const t=e.target;
       const txt=(t.textContent||'').toLowerCase().trim();
       if(txt.startsWith('open upgrades')) this.toggleUp(true);
       if(this.ui.panelUp && this.ui.panelUp.contains(t) && txt.startsWith('close')) this.toggleUp(false);
     });
-    // Try to find a specific "Close" button inside the panel and bind it
-    const tryBindClose=()=>{
-      const p=this.ui.panelUp; if(!p) return;
-      const c=[...p.querySelectorAll('button,[role="button"],.btn')].find(b=> (b.textContent||'').toLowerCase().includes('close'));
-      c?.addEventListener('click', ()=>this.toggleUp(false));
-    };
-    tryBindClose();
 
     // Systems
     this.audio = new AudioBus();
@@ -137,6 +133,19 @@ export class Game {
     this.timeScale=1; this.gravDir=1;
     this.MOD={ gravity:1420, gravFlipEvery:20000, timePulseEvery:8000, timePulseMin:.55, timePulseMax:1.6, hazardRiseSpeed:18 };
     this.nextGravFlip=now()+this.MOD.gravFlipEvery; this.nextTimePulse=now()+this.MOD.timePulseEvery; this.pulsing=false;
+
+    // Player movement tuning (faster & snappier)
+    this.PHYS = {
+      moveAccel: 2400,
+      maxSpeed: 380,
+      airControl: 0.85,
+      groundFriction: 1800,
+      airFriction: 650,
+      jumpVel: 560
+    };
+
+    // No time pulse right after spawn/boss
+    this.disablePulseUntil = now() + 4000;
 
     // State
     this.platforms=[]; this.enemies=[]; this.bullets=[]; this.effects=[]; this.shards=[];
@@ -150,7 +159,7 @@ export class Game {
     this.bosses = makeBosses(this);
     this.realms = makeRealms(this);
 
-    // Mode/world from opts
+    // Mode/world mods
     this.mode = opts?.mode||'campaign';
     this.world = opts?.world||null;
     if(this.world?.modifiers){
@@ -158,12 +167,12 @@ export class Game {
       this.MOD.timePulseEvery = (this.world.modifiers.timePulse||8)*1000;
     }
 
-    // Start unpaused and ensure overlays are hidden
+    // Start unpaused, hide overlays
     this.paused=false;
     hideEl(this.ui.pause, true);
     hideEl(this.ui.panelUp, true);
 
-    // Init world & loop
+    // Init & loop
     this.addArena(); this.spawnWave(4);
     setTimeout(()=> this.spawnBoss(), 4000);
     this.log(`Entering ${this.realms.active?.name||'Realm'}.`);
@@ -262,8 +271,7 @@ export class Game {
     if(this.boss) return;
     const b = this.bosses.pick(this.world?.boss);
     const p = this.players[0];
-
-    // Reposition boss so it doesn't spawn on top of the player
+    // Place boss away from player
     let tries=0;
     while(tries++<40){
       b.pos.x = rand(120, this.W-120);
@@ -271,7 +279,7 @@ export class Game {
       const farEnough = Math.abs(b.pos.x - p.pos.x) > 220;
       if(farEnough && !this.rectsOverlap(b.rect(), p.rect())) break;
     }
-
+    this.disablePulseUntil = now() + 3000;
     this.boss = b;
     this.log(`${b.name} enters the realm!`);
   }
@@ -366,7 +374,6 @@ export class Game {
       this.fxTrail(p.pos.x,p.pos.y); this.shake(6,120); this.audio.dash();
     }
   }
-  grappleStart(p){ p.grapple={x:this.mouse.x,y:this.mouse.y,active:true}; }
 
   // --- FX & Util ---
   fxSlash(x,y,big=false){ this.effects.push({type:'slash',x,y,t:0,max:0.25,big}); }
@@ -389,13 +396,155 @@ export class Game {
     for(let i=0;i<amt;i++){ this.shards.push({x,y,vx:rand(-120,120),vy:rand(-220,-80),g:700,life:8}); }
   }
 
+  // --- Pretty drawing helpers ---
+  drawPlayer(ctx, p, time){
+    ctx.save(); ctx.translate(p.pos.x,p.pos.y);
+    const bob = Math.sin(time*3 + p.id)*2;
+
+    // Shadow
+    ctx.save();
+    ctx.globalAlpha = 0.15;
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.ellipse(0, p.h/2 + 8, p.w*0.55, 6, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    // Capsule body
+    const grad = ctx.createLinearGradient(0, -p.h/2, 0, p.h/2);
+    grad.addColorStop(0, '#eaf2ff'); grad.addColorStop(1, '#cfe3ff');
+    ctx.fillStyle = grad; ctx.strokeStyle = p.tint; ctx.lineWidth = 3;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(-p.w/2, -p.h/2 + bob, p.w, p.h, 10);
+    else {
+      let x=-p.w/2, y=-p.h/2 + bob, w=p.w, h=p.h, r=10;
+      ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r);
+      ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r);
+      ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+    }
+    ctx.fill(); ctx.stroke();
+
+    // Eyes (blink)
+    const blink = (Math.floor(time*2+p.id)%8===0)?0.15:1;
+    ctx.fillStyle = '#17263a';
+    ctx.fillRect(-8, -8 + bob, 6, 6*blink);
+    ctx.fillRect( 2, -8 + bob, 6, 6*blink);
+
+    // Style aura
+    let ringCol = null;
+    if (p.style==='magic') ringCol = 'rgba(128,222,234,0.55)';
+    else if (p.style==='gun') ringCol = 'rgba(239,154,154,0.5)';
+    if (ringCol) {
+      ctx.strokeStyle = ringCol; ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(0, bob, 26 + Math.min(p.combo,15)*0.3, 0, Math.PI*2);
+      ctx.stroke();
+    }
+
+    // Speed lines
+    if (Math.abs(p.vel.x)>260) {
+      ctx.globalAlpha = 0.35;
+      ctx.fillStyle = '#bbdefb';
+      for(let i=1;i<=3;i++){
+        ctx.fillRect(-p.w/2 - i*8, -p.h/3 + bob, 12, 4);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    ctx.restore();
+  }
+
+  // High-detail goblin-style boss (original design)
+  drawBoss(ctx, b, time){
+    ctx.save(); ctx.translate(b.pos.x,b.pos.y);
+
+    // Shadow
+    ctx.save(); ctx.globalAlpha=0.18;
+    ctx.fillStyle='#000'; ctx.beginPath();
+    ctx.ellipse(0,b.h/2+10,b.w*0.55,8,0,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+
+    // Torso (leather armor)
+    const torsoGrad = ctx.createLinearGradient(0,-b.h*0.1,0,b.h*0.5);
+    torsoGrad.addColorStop(0,'#5a3e28'); torsoGrad.addColorStop(1,'#7a5338');
+    ctx.fillStyle=torsoGrad; ctx.strokeStyle=b.enraged?'#ff8f50':'#caa27a';
+    ctx.lineWidth=3; ctx.shadowColor=b.enraged?'rgba(255,96,0,0.5)':'rgba(0,0,0,0.25)'; ctx.shadowBlur=b.enraged?20:10;
+
+    const torsoW=b.w*0.9, torsoH=b.h*0.6;
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(-torsoW/2, -torsoH/2+10, torsoW, torsoH, 12);
+    else {
+      let x=-torsoW/2, y=-torsoH/2+10, w=torsoW, h=torsoH, r=12;
+      ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r);
+      ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r);
+      ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+    }
+    ctx.fill(); ctx.stroke();
+    ctx.shadowBlur=0;
+
+    // Head (green skin)
+    ctx.save();
+    ctx.translate(0,-torsoH/2-16);
+    const headGrad=ctx.createLinearGradient(0,-28,0,28);
+    headGrad.addColorStop(0,b.enraged?'#8de139':'#9be65a');
+    headGrad.addColorStop(1,b.enraged?'#5fb728':'#6ec534');
+    ctx.fillStyle=headGrad; ctx.strokeStyle=b.enraged?'#ffb74d':'#c5e1a5'; ctx.lineWidth=3;
+
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(-36,-28,72,56,14);
+    else {
+      let x=-36,y=-28,w=72,h=56,r=14;
+      ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r);
+      ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r);
+      ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+    }
+    ctx.fill(); ctx.stroke();
+
+    // Ears
+    ctx.fillStyle=b.enraged?'#7bcf2f':'#85d93f';
+    ctx.beginPath(); ctx.moveTo(-36, -6); ctx.quadraticCurveTo(-56,-10,-60,6); ctx.quadraticCurveTo(-44,4,-36,2); ctx.fill();
+    ctx.beginPath(); ctx.moveTo( 36, -6); ctx.quadraticCurveTo( 56,-10, 60,6); ctx.quadraticCurveTo( 44,4, 36,2); ctx.fill();
+
+    // Eyes glow
+    ctx.fillStyle=b.enraged?'#ffd54f':'#fff176';
+    const blink = (Math.floor(time*2)%10===0)?0.15:1;
+    ctx.fillRect(-14,-6,10,10*blink);
+    ctx.fillRect(  4,-6,10,10*blink);
+    ctx.fillStyle='rgba(255,249,196,0.45)';
+    ctx.beginPath(); ctx.arc(-9,-1,8,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc( 9,-1,8,0,Math.PI*2); ctx.fill();
+
+    // Tusks
+    ctx.fillStyle='#f5f5f5';
+    ctx.beginPath(); ctx.moveTo(-8,12); ctx.lineTo(-2,18); ctx.lineTo(-6,8); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo( 8,12); ctx.lineTo( 2,18); ctx.lineTo( 6,8); ctx.closePath(); ctx.fill();
+
+    // Mouth line
+    ctx.strokeStyle='#2f3b12'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(-10,10); ctx.quadraticCurveTo(0,14,10,10); ctx.stroke();
+
+    ctx.restore();
+
+    // Shoulder pads
+    ctx.fillStyle='#8d6e63';
+    ctx.beginPath(); ctx.ellipse(-torsoW*0.35,-torsoH*0.15,18,12,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse( torsoW*0.35,-torsoH*0.15,18,12,0,0,Math.PI*2); ctx.fill();
+
+    // Belt + loincloth
+    ctx.fillStyle='#3e2723'; ctx.fillRect(-torsoW/2, 6, torsoW, 10);
+    ctx.fillStyle='#6d4c41';
+    ctx.beginPath(); ctx.moveTo(0,16); ctx.lineTo(-12,46); ctx.lineTo(12,46); ctx.closePath(); ctx.fill();
+
+    ctx.restore();
+  }
+
   // --- Update ---
   update(dt){
     if(now()>this.nextGravFlip){
       this.gravDir*=-1; this.nextGravFlip=now()+this.MOD.gravFlipEvery;
       this.log(`Gravity flipped ${this.gravDir>0?'DOWN':'UP'}!`,'warn'); this.audio.flip();
     }
-    if(now()>this.nextTimePulse){
+    if(now()>this.nextTimePulse && now()>this.disablePulseUntil){
       this.pulsing=true; this.nextTimePulse=now()+this.MOD.timePulseEvery;
       const target=rand(this.MOD.timePulseMin,this.MOD.timePulseMax); this.pulseTo(target);
     }
@@ -416,23 +565,45 @@ export class Game {
     // platforms
     for(const p of this.platforms) p.update(dt2,t);
 
-    // players
+    // players — faster movement model
     const p0=this.players[0];
     this.input.pollGamepad();
     for(const p of this.players){
       if(p.id===2 && !p.enabled) continue;
       if(!p.alive) continue;
+
       p.dashCD=Math.max(0,p.dashCD-dt2);
       if(p.onGround){ p.jumps=2; p.dashCharges=p.maxDash; }
 
       const inp=p.input();
-      const ax=inp.ax*1400;
-      p.vel.x = lerp(p.vel.x, ax*0.02, 0.15);
+
+      // Horizontal accel / friction
+      const accel = this.PHYS.moveAccel * (p.onGround ? 1 : this.PHYS.airControl);
+      p.vel.x += (inp.ax||0) * accel * dt2;
+
+      if(Math.abs(inp.ax) < 0.001){
+        const fr = (p.onGround ? this.PHYS.groundFriction : this.PHYS.airFriction) * dt2;
+        if(p.vel.x > 0) p.vel.x = Math.max(0, p.vel.x - fr);
+        else if(p.vel.x < 0) p.vel.x = Math.min(0, p.vel.x + fr);
+      }
+
+      p.vel.x = clamp(p.vel.x, -this.PHYS.maxSpeed, this.PHYS.maxSpeed);
+
+      // Gravity
       p.vel.y += this.MOD.gravity*this.gravDir*dt2;
+
+      // Facing
       if(Math.abs(p.vel.x)>6) p.facing=Math.sign(p.vel.x);
 
+      // Style switch
       if(p.canSwitch){ if(inp.style1) p.style='sword'; if(inp.style2) p.style='magic'; if(inp.style3) p.style='gun'; }
-      if(inp.jump && (p.onGround || p.jumps>0)){ p.vel.y -= 520*this.gravDir; p.jumps--; this.audio.jump(); }
+
+      // Jump
+      if(inp.jump && (p.onGround || p.jumps>0)){
+        p.vel.y -= this.PHYS.jumpVel*this.gravDir; p.jumps--; this.audio.jump();
+      }
+
+      // Attacks / dash / grapple
       if(inp.melee) this.doMelee(p);
       if(inp.magic) this.shootMagic(p);
       if(inp.dash) this.dash(p);
@@ -443,6 +614,7 @@ export class Game {
         p.vel.x+=(dx/dist)*pull; p.vel.y+=(dy/dist)*pull;
         if(dist<30) p.grapple.active=false;
       }
+
       this.collideWithPlatforms(p,dt2);
       if(p.hp<=0){ p.alive=false; this.log(`Player ${p.id} fell.`,'danger'); }
     }
@@ -505,7 +677,7 @@ export class Game {
       }
     }
 
-    // effects & shards tidy
+    // effects & shards cleanup
     for(const fx of this.effects) fx.t+=dt2;
     for(const s of this.shards){
       s.vy+=s.g*dt2*this.gravDir; s.x+=s.vx*dt2; s.y+=s.vy*dt2; s.life-=dt2;
@@ -546,7 +718,11 @@ export class Game {
     const ctx=this.ctx,W=this.W,H=this.H;
     ctx.clearRect(0,0,W,H);
     const g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#0b0f17'); g.addColorStop(1,'#091322'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-    ctx.save(); ctx.globalAlpha = Math.max(-0.5, Math.min(0.5, (this.timeScale-1)*0.7)); ctx.fillStyle='#64b5f6'; ctx.fillRect(0,0,W,H); ctx.restore();
+    // subtle warp overlay
+    ctx.save();
+    ctx.globalAlpha = Math.min(0.5, Math.abs(this.timeScale-1)*0.7);
+    ctx.fillStyle='#64b5f6'; ctx.fillRect(0,0,W,H);
+    ctx.restore();
 
     const cs=this.cameraShake||{x:0,y:0}; ctx.save(); ctx.translate(cs.x,cs.y);
 
@@ -563,39 +739,14 @@ export class Game {
     ctx.strokeStyle='#ff7043'; ctx.setLineDash([8,6]); ctx.beginPath(); ctx.moveTo(0,this.lavaY); ctx.lineTo(W,this.lavaY); ctx.stroke(); ctx.setLineDash([]);
 
     // players
+    const tNow = performance.now()/1000;
     for(const p of this.players){
       if(p.id===2 && !p.enabled) continue;
-      ctx.save(); ctx.translate(p.pos.x,p.pos.y);
-      ctx.fillStyle='#cfe3ff'; ctx.strokeStyle=p.tint; ctx.lineWidth=2.5;
-      ctx.beginPath();
-      if(ctx.roundRect) ctx.roundRect(-p.w/2,-p.h/2,p.w,p.h,6);
-      else{
-        const r=6; const x=-p.w/2,y=-p.h/2,w=p.w,h=p.h;
-        ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
-        ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
-      }
-      ctx.fill(); ctx.stroke();
-      ctx.fillStyle='#10243a'; ctx.fillRect(-8,-8,6,6); ctx.fillRect(2,-8,6,6);
-      if(p.style==='magic'){ ctx.strokeStyle='#80deea88'; ctx.beginPath(); ctx.arc(0,0,28,0,Math.PI*2); ctx.stroke(); }
-      if(p.style==='gun'){ ctx.strokeStyle='#ef9a9a66'; ctx.beginPath(); ctx.arc(0,0,30,0,Math.PI*2); ctx.stroke(); }
-      ctx.strokeStyle='#64b5f6'; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(p.facing>0?18:-18,0); ctx.stroke();
-      ctx.restore();
+      this.drawPlayer(ctx, p, tNow);
     }
 
     // boss
-    if(this.boss){
-      const b=this.boss; ctx.save(); ctx.translate(b.pos.x,b.pos.y);
-      ctx.fillStyle='#ffe082'; ctx.strokeStyle='#ffd54f'; ctx.lineWidth=2.5;
-      ctx.beginPath();
-      if(ctx.roundRect) ctx.roundRect(-b.w/2,-b.h/2,b.w,b.h,10);
-      else{
-        const r=10,x=-b.w/2,y=-b.h/2,w=b.w,h=b.h;
-        ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
-        ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
-      }
-      ctx.fill(); ctx.stroke(); ctx.fillStyle='#333'; ctx.fillRect(-12,-12,8,8); ctx.fillRect(4,-12,8,8);
-      ctx.restore();
-    }
+    if(this.boss){ this.drawBoss(ctx, this.boss, tNow); }
 
     // bullets
     ctx.fillStyle='#a5d6a7';
