@@ -1,33 +1,32 @@
-// Fracture_Realms_Full_v2/js/boot.js — FULL FILE REPLACE
+// Fracture_Realms_Full_v2/js/boot.js  — minimal, correct entry point
 
 import { Game } from './game.js';
-import { Campaign } from './campaign.js';
-import { SceneManager } from './scene_manager.js';
 
-// Ensure the DOM exists before we query elements in Game()
-window.addEventListener('DOMContentLoaded', () => {
+function start() {
   const canvas = document.getElementById('game');
+  const game = new Game(canvas, { mode: 'campaign' });
 
-  // Create campaign/scene manager if your files export them.
-  // (Your game.js uses optional chaining so it's safe even if these are minimal.)
-  const campaign = typeof Campaign === 'function' ? new Campaign() : undefined;
-  const sm = typeof SceneManager === 'function' ? new SceneManager() : undefined;
-
-  // Start the game
-  const game = new Game(canvas, { mode: 'campaign' }, campaign, sm);
-
-  // Expose for console debugging
+  // expose for quick debugging in devtools
   window.game = game;
 
-  // Keyboard shortcuts for UX
+  // Optional: if your HTML has explicit "Open/Close Upgrades" buttons,
+  // wire them here. (Safe no-ops if the elements don't exist.)
+  const openUp =
+    document.getElementById('btnOpenUpgrades') ||
+    document.querySelector('[data-action="open-upgrades"]');
+  const closeUp =
+    document.getElementById('btnCloseUpgrades') ||
+    document.querySelector('[data-action="close-upgrades"]');
+
+  if (openUp)  openUp.addEventListener('click', () => game.toggleUp(true));
+  if (closeUp) closeUp.addEventListener('click', () => game.toggleUp(false));
+
+  // Convenience hotkeys
   window.addEventListener('keydown', (e) => {
-    if (e.key.toLowerCase() === 'p') {
-      // Toggle pause
-      game.togglePause();
-    }
-    if (e.key.toLowerCase() === 'u') {
-      // Toggle upgrades
-      game.toggleUp();
-    }
+    const k = e.key.toLowerCase();
+    if (k === 'p') game.togglePause(); // pause/resume
+    if (k === 'u') game.toggleUp();    // open/close upgrades
   });
-});
+}
+
+window.addEventListener('DOMContentLoaded', start);
