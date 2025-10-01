@@ -202,7 +202,7 @@ body.game-active #game {
   font-weight: 600;
   transition: all 0.2s ease;
   font-family: inherit;
-  pointer-events: auto;
+  pointer-events: auto !important;
 }
 
 .btn:hover {

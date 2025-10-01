@@ -110,11 +110,15 @@ export class Game {
 
     // Buttons with proper event handling
     if (this.ui.btnPause) {
+      console.log('Pause button found:', this.ui.btnPause);
       this.ui.btnPause.addEventListener('click', (e) => {
+        console.log('Pause button clicked!');
         e.preventDefault();
         e.stopPropagation();
         this.togglePause();
       });
+    } else {
+      console.error('Pause button NOT found!');
     }
     if (this.ui.btnResume) {
       this.ui.btnResume.addEventListener('click', (e) => {
@@ -176,17 +180,17 @@ export class Game {
     // Options/runtime
     this.screenShake=true; this.particlesOn=true; this.assist=false;
     this.timeScale=1; this.gravDir=1;
-    this.MOD={ gravity:1420, gravFlipEvery:20000, timePulseEvery:8000, timePulseMin:.55, timePulseMax:1.6, hazardRiseSpeed:18 };
+    this.MOD={ gravity:1000, gravFlipEvery:30000, timePulseEvery:12000, timePulseMin:.7, timePulseMax:1.3, hazardRiseSpeed:12 };
     this.nextGravFlip=now()+this.MOD.gravFlipEvery; this.nextTimePulse=now()+this.MOD.timePulseEvery; this.pulsing=false;
 
-    // Player movement tuning (faster & snappier)
+    // Player movement tuning (balanced speed)
     this.PHYS = {
-      moveAccel: 2400,
-      maxSpeed: 380,
-      airControl: 0.85,
-      groundFriction: 1800,
-      airFriction: 650,
-      jumpVel: 560
+      moveAccel: 1800,
+      maxSpeed: 280,
+      airControl: 0.75,
+      groundFriction: 1400,
+      airFriction: 500,
+      jumpVel: 450
     };
 
     // No time pulse right after spawn/boss
