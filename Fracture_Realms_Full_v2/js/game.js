@@ -95,6 +95,7 @@ export class Game {
       pause:$('#pauseMenu'),
       btnPause:$('#btnPause'), btnResume:$('#btnResume'),
       btnRestart:$('#btnRestartRealm'), btnNext:$('#btnNextRealm'),
+      btnReturnToMenu:$('#btnReturnToMenu'),
       chkShake:$('#chkScreenShake'), chkParticles:$('#chkParticles'), chkAssist:$('#chkAssist')
     };
 
@@ -134,6 +135,13 @@ export class Game {
         e.preventDefault();
         e.stopPropagation();
         this.nextRealm();
+      });
+    }
+    if (this.ui.btnReturnToMenu) {
+      this.ui.btnReturnToMenu.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.returnToMenu();
       });
     }
     if (this.ui.chkShake) {
@@ -815,6 +823,10 @@ export class Game {
     this.realmIndex=(this.realmIndex+1)%this.realms.list.length;
     this.realms.setActive(this.realmIndex);
     this.restartRealm(); this.log(`Entering ${this.realms.active.name}.`);
+  }
+  returnToMenu(){
+    // Reload the page to return to menu
+    window.location.reload();
   }
 }
 

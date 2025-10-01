@@ -281,6 +281,11 @@ kbd {
   align-items: flex-start;
   gap: 12px;
   flex-wrap: wrap;
+  pointer-events: none;
+}
+
+#hud * {
+  pointer-events: auto;
 }
 
 .chips {
