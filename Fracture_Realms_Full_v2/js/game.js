@@ -221,8 +221,8 @@ export class Game {
 
     // Start unpaused, hide overlays
     this.paused=false;
-    hideEl(this.ui.pause, true);
-    hideEl(this.ui.panelUp, true);
+    if (this.ui.pause) this.ui.pause.style.display = 'none';
+    if (this.ui.panelUp) this.ui.panelUp.style.display = 'none';
 
     // Init & loop
     this.addArena(); this.spawnWave(4);
@@ -241,14 +241,21 @@ export class Game {
 
   // --- UI helpers ---
   toggleUp(force){
-    const show = force===undefined ? (this.ui.panelUp?.style.display==='none' || this.ui.panelUp?.classList.contains('hidden')) : force;
-    this._hideEl(this.ui.panelUp, !show);
+    const show = force===undefined ? (this.ui.panelUp?.style.display==='none') : force;
+    if (this.ui.panelUp) {
+      this.ui.panelUp.style.display = show ? 'block' : 'none';
+    }
     if(show) this.renderUpgradePanel();
   }
   togglePause(force){
     const show = force===undefined ? !this.paused : force;
     this.paused = show;
-    this._hideEl(this.ui.pause, !show);
+    
+    // Direct style manipulation for reliability
+    if (this.ui.pause) {
+      this.ui.pause.style.display = show ? 'grid' : 'none';
+      console.log(show ? '⏸ Game paused' : '▶ Game resumed');
+    }
   }
   log(msg, cls=''){
     if(!this.ui.log) return;
