@@ -741,8 +741,15 @@ export class Game {
       if(this.boss.hp<=0){
         this.log(`${this.boss.name} defeated! Realm stabilizing...`,'ok');
         this.spawnShards(this.boss.pos.x,this.boss.pos.y,20);
-        this.audio.victory(); this.boss=null;
+        this.audio.victory(); 
+        const bossName = this.boss.name;
+        this.boss=null;
         if(this.mode==='campaign'){ this.campaign?.unlockNext?.(); this.sm?.toast?.('World cleared! Next world unlocked.'); }
+        // Show victory pause menu
+        setTimeout(() => {
+          alert(`🎉 Victory! ${bossName} defeated!\n\nUse the pause menu to:\n- Restart Realm\n- Next Realm\n- Return to Menu`);
+          this.togglePause(true);
+        }, 1000);
       }
     }
 
