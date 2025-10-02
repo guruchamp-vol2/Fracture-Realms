@@ -28,14 +28,10 @@ function startGame() {
     console.error('❌ HUD element not found!');
   }
   
-  // Show log
+  // Hide log (removed per user request)
   const logEl = document.getElementById('logWrap');
   if (logEl) {
-    logEl.style.display = 'block';
-    logEl.classList.remove('hidden');
-    console.log('✓ Log shown');
-  } else {
-    console.error('❌ Log element not found!');
+    logEl.style.display = 'none';
   }
 
   const canvas = document.getElementById('game');

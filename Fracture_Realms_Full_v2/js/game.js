@@ -314,8 +314,9 @@ export class Game {
   addArena(){
     this.platforms.length=0;
     const floorY=this.H*0.75;
-    for(let i=0;i<10;i++){
-      const w=rand(140,260), x=rand(40,this.W-40-w), y=floorY - i*rand(68, 95);
+    // More platforms that continuously spawn
+    for(let i=0;i<15;i++){
+      const w=rand(120,240), x=rand(40,this.W-40-w), y=floorY - i*rand(60, 90);
       this.platforms.push(new Platform(x,y,w,18,this.assist));
     }
     this.platforms.push(new Platform(40, floorY+80, this.W-80, 22, this.assist));
@@ -622,8 +623,16 @@ export class Game {
     const lavaDir=this.gravDir>0?-1:1;
     this.lavaY += lavaDir * (this.MOD.hazardRiseSpeed*(this.boss?.enraged?1.6:1)) * dt2;
 
-    // platforms
+    // platforms - respawn dead ones
     for(const p of this.platforms) p.update(dt2,t);
+    
+    // Respawn platforms that broke
+    const alivePlatforms = this.platforms.filter(p => !p.dead).length;
+    if(alivePlatforms < 8) {
+      const floorY=this.H*0.75;
+      const w=rand(120,240), x=rand(40,this.W-40-w), y=rand(floorY-600, floorY-100);
+      this.platforms.push(new Platform(x,y,w,18,this.assist));
+    }
 
     // players — faster movement model
     const p0=this.players[0];
