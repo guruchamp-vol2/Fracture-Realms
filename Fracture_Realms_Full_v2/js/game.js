@@ -5,9 +5,8 @@ import { makeBosses } from './modules/bosses.js';
 import { makeRealms } from './modules/realms.js';
 import { Input } from './modules/input.js';
 
-// Enhanced systems - temporarily disabled to fix startup issues
-// TODO: Re-enable these modules once basic game is working
-// import { AchievementSystem } from './modules/achievements.js';
+// Enhanced systems - re-enabling one by one to test
+import { AchievementSystem } from './modules/achievements.js';
 // import { ParticleSystem } from './modules/particles.js';
 // import { PowerUpSystem } from './modules/powerups.js';
 // import { WeaponSystem } from './modules/weapons.js';
@@ -196,9 +195,8 @@ export class Game {
     this.audio = new AudioBus();
     this.input = new Input();
     
-    // Enhanced Systems - temporarily disabled
-    // TODO: Re-enable these once basic game is working
-    // this.achievements = new AchievementSystem(this);
+    // Enhanced Systems - re-enabling one by one
+    this.achievements = new AchievementSystem(this);
     // this.particleSystem = new ParticleSystem(this);
     // this.powerUpSystem = new PowerUpSystem(this);
     // this.weaponSystem = new WeaponSystem(this);
@@ -642,9 +640,8 @@ export class Game {
     }
     const t=performance.now()/1000; const dt2=dt*this.timeScale;
     
-    // Update enhanced systems - temporarily disabled
-    // TODO: Re-enable these once basic game is working
-    // this.achievements?.checkAchievements();
+    // Update enhanced systems - re-enabling one by one
+    this.achievements?.checkAchievements();
     // this.particleSystem?.update(dt2);
     // this.powerUpSystem?.update(dt2);
     // this.weaponSystem?.update(dt2);
