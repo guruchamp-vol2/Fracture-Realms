@@ -12,7 +12,7 @@ export class OnlineMultiplayerSystem {
     this.isConnected = false;
     this.connectionState = 'disconnected';
     
-    this.serverUrl = 'https://fracture-realms-server.herokuapp.com'; // Replace with your server
+    this.serverUrl = 'https://fracture-realms.onrender.com'; // Your Render deployment URL
     this.iceServers = [
       { urls: 'stun:stun.l.google.com:19302' },
       { urls: 'stun:stun1.l.google.com:19302' }
@@ -553,7 +553,7 @@ export class OnlineLeaderboardSystem {
     this.playerRankings = new Map();
     this.isConnected = false;
     
-    this.serverUrl = 'https://fracture-realms-server.herokuapp.com';
+    this.serverUrl = 'https://fracture-realms.onrender.com';
     this.socket = null;
   }
 

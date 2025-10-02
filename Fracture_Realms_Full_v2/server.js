@@ -20,10 +20,28 @@ const io = socketIo(server, {
 app.use(cors());
 app.use(express.json());
 
-// MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/fracture-realms', {
+// MongoDB connection for Render deployment
+const mongoUri = process.env.MONGODB_URI || process.env.MONGODB_CONNECTION_STRING || 'mongodb://localhost:27017/fracture-realms';
+
+mongoose.connect(mongoUri, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
+  socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+  bufferMaxEntries: 0, // Disable mongoose buffering
+  bufferCommands: false, // Disable mongoose buffering
+});
+
+mongoose.connection.on('connected', () => {
+  console.log('✅ Connected to MongoDB successfully');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('❌ MongoDB connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('⚠️ MongoDB disconnected');
 });
 
 // Database schemas
@@ -35,6 +53,29 @@ const playerSchema = new mongoose.Schema({
   wins: Number,
   losses: Number,
   achievements: [String],
+  
+  // Adaptive difficulty tracking
+  adaptiveDifficulty: {
+    currentLevel: { type: Number, default: 1 },
+    maxLevelReached: { type: Number, default: 1 },
+    performanceHistory: [{
+      timestamp: Date,
+      difficultyLevel: Number,
+      performanceScore: Number,
+      metrics: {
+        hitAccuracy: Number,
+        damageTaken: Number,
+        deaths: Number,
+        platformFalls: Number,
+        longestSurvival: Number,
+        maxCombo: Number,
+        averageCombo: Number
+      }
+    }],
+    averagePerformance: { type: Number, default: 0.5 },
+    difficultyAdjustments: { type: Number, default: 0 }
+  },
+  
   createdAt: { type: Date, default: Date.now },
   lastActive: { type: Date, default: Date.now }
 });
@@ -389,6 +430,118 @@ app.get('/api/leaderboards/:type', async (req, res) => {
   } catch (error) {
     console.error('Error getting leaderboard:', error);
     res.status(500).json({ success: false, error: 'Failed to get leaderboard' });
+  }
+});
+
+// Adaptive difficulty endpoints
+app.post('/api/adaptive-difficulty/submit', async (req, res) => {
+  try {
+    const { playerId, performanceData } = req.body;
+    
+    const player = await Player.findOne({ playerId });
+    if (!player) {
+      return res.status(404).json({ success: false, error: 'Player not found' });
+    }
+    
+    // Update adaptive difficulty data
+    if (!player.adaptiveDifficulty) {
+      player.adaptiveDifficulty = {
+        currentLevel: 1,
+        maxLevelReached: 1,
+        performanceHistory: [],
+        averagePerformance: 0.5,
+        difficultyAdjustments: 0
+      };
+    }
+    
+    // Add performance data to history
+    player.adaptiveDifficulty.performanceHistory.push({
+      timestamp: new Date(),
+      difficultyLevel: performanceData.difficultyLevel,
+      performanceScore: performanceData.performanceScore,
+      metrics: performanceData.metrics
+    });
+    
+    // Keep only last 50 performance records
+    if (player.adaptiveDifficulty.performanceHistory.length > 50) {
+      player.adaptiveDifficulty.performanceHistory = player.adaptiveDifficulty.performanceHistory.slice(-50);
+    }
+    
+    // Update average performance
+    const totalScore = player.adaptiveDifficulty.performanceHistory.reduce((sum, p) => sum + p.performanceScore, 0);
+    player.adaptiveDifficulty.averagePerformance = totalScore / player.adaptiveDifficulty.performanceHistory.length;
+    
+    // Update max level reached
+    player.adaptiveDifficulty.maxLevelReached = Math.max(
+      player.adaptiveDifficulty.maxLevelReached,
+      performanceData.difficultyLevel
+    );
+    
+    await player.save();
+    
+    res.json({ success: true, message: 'Performance data submitted' });
+  } catch (error) {
+    console.error('Error submitting performance data:', error);
+    res.status(500).json({ success: false, error: 'Failed to submit performance data' });
+  }
+});
+
+app.get('/api/adaptive-difficulty/:playerId', async (req, res) => {
+  try {
+    const { playerId } = req.params;
+    
+    const player = await Player.findOne({ playerId });
+    if (!player) {
+      return res.status(404).json({ success: false, error: 'Player not found' });
+    }
+    
+    res.json({ 
+      success: true, 
+      adaptiveDifficulty: player.adaptiveDifficulty || {
+        currentLevel: 1,
+        maxLevelReached: 1,
+        performanceHistory: [],
+        averagePerformance: 0.5,
+        difficultyAdjustments: 0
+      }
+    });
+  } catch (error) {
+    console.error('Error getting adaptive difficulty data:', error);
+    res.status(500).json({ success: false, error: 'Failed to get adaptive difficulty data' });
+  }
+});
+
+app.get('/api/adaptive-difficulty/global-stats', async (req, res) => {
+  try {
+    const stats = await Player.aggregate([
+      {
+        $match: {
+          'adaptiveDifficulty.currentLevel': { $exists: true }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          averageDifficulty: { $avg: '$adaptiveDifficulty.currentLevel' },
+          maxDifficulty: { $max: '$adaptiveDifficulty.maxLevelReached' },
+          totalPlayers: { $sum: 1 },
+          averagePerformance: { $avg: '$adaptiveDifficulty.averagePerformance' }
+        }
+      }
+    ]);
+    
+    res.json({ 
+      success: true, 
+      stats: stats[0] || {
+        averageDifficulty: 1,
+        maxDifficulty: 1,
+        totalPlayers: 0,
+        averagePerformance: 0.5
+      }
+    });
+  } catch (error) {
+    console.error('Error getting global adaptive difficulty stats:', error);
+    res.status(500).json({ success: false, error: 'Failed to get global stats' });
   }
 });
 

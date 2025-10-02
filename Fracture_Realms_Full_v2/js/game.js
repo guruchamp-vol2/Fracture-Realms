@@ -10,6 +10,7 @@ import { AchievementSystem } from './modules/achievements.js';
 import { MobSystem } from './modules/mobs.js';
 import { StageSystem } from './modules/stages.js';
 import { OnlineMultiplayerSystem, OnlineLeaderboardSystem } from './modules/online_multiplayer.js';
+import { AdaptiveDifficultySystem } from './modules/adaptive_difficulty.js';
 // import { ParticleSystem } from './modules/particles.js';
 // import { PowerUpSystem } from './modules/powerups.js';
 // import { WeaponSystem } from './modules/weapons.js';
@@ -204,6 +205,7 @@ export class Game {
     this.stageSystem = new StageSystem(this);
     this.onlineMultiplayer = new OnlineMultiplayerSystem(this);
     this.onlineLeaderboard = new OnlineLeaderboardSystem(this);
+    this.adaptiveDifficulty = new AdaptiveDifficultySystem(this);
     // this.particleSystem = new ParticleSystem(this);
     // this.powerUpSystem = new PowerUpSystem(this);
     // this.weaponSystem = new WeaponSystem(this);
@@ -652,6 +654,7 @@ export class Game {
     this.mobSystem?.update(dt2);
     this.stageSystem?.update(dt2);
     this.onlineMultiplayer?.update(dt2);
+    this.adaptiveDifficulty?.update(dt2);
     // this.particleSystem?.update(dt2);
     // this.powerUpSystem?.update(dt2);
     // this.weaponSystem?.update(dt2);
@@ -667,6 +670,16 @@ export class Game {
     this.ui.chipShards && (this.ui.chipShards.textContent=`Shards: ${this.shardCount|0}`);
     this.ui.chipBoss && (this.ui.chipBoss.textContent=this.boss? `${this.boss.name} ${Math.max(0,this.boss.hp)|0}/${this.boss.maxHP}`:'Boss: —');
     this.ui.chipRealm && (this.ui.chipRealm.textContent=`Realm: ${this.realms.active?.name||'Realm'}`);
+    
+    // Adaptive difficulty UI
+    if (this.adaptiveDifficulty) {
+      const difficultyLevel = this.adaptiveDifficulty.getDifficultyLevel();
+      const performanceRating = this.adaptiveDifficulty.getPerformanceRating();
+      
+      this.ui.chipDifficulty && (this.ui.chipDifficulty.textContent=`Difficulty: ${Math.round(difficultyLevel)}`);
+      this.ui.chipPerformance && (this.ui.chipPerformance.textContent=`Performance: ${performanceRating.rating}`);
+      this.ui.chipPerformance && (this.ui.chipPerformance.style.color = performanceRating.color);
+    }
 
     // hazards
     const lavaDir=this.gravDir>0?-1:1;
