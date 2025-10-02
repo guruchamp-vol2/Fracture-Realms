@@ -751,7 +751,8 @@ export class Game {
     this.shards=this.shards.filter(s=>s.life>0);
 
     if(this.enemies.length<4 && (!this.boss || this.boss.hp<this.boss.maxHP*0.5)) this.spawnWave(1);
-    if(!this.boss && this.shardCount>=10 && Math.random()<0.005) this.spawnBoss();
+    // Don't respawn boss automatically - only spawn once at start
+    // if(!this.boss && this.shardCount>=10 && Math.random()<0.005) this.spawnBoss();
 
     if(this.players[0].hp<=0 && this.players[0].alive){ 
       this.players[0].alive=false;
