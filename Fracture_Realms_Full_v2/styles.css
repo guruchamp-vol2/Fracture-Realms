@@ -610,3 +610,254 @@ kbd {
   opacity: 0;
   transform: translateY(-80px);
 }
+
+/* Multiplayer Styles */
+.game-modes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.room-code {
+  background: linear-gradient(135deg, #1a237e, #3949ab);
+  border: 2px solid #7986cb;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+  text-align: center;
+}
+
+.room-code h3 {
+  color: #e8eaf6;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+
+.room-code-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #fff;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+  margin: 12px 0;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+.online-players {
+  background: linear-gradient(135deg, #1a237e, #3949ab);
+  border: 2px solid #7986cb;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.online-players h3 {
+  color: #e8eaf6;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+}
+
+.players-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.player-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+.player-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+}
+
+.player-info {
+  flex: 1;
+}
+
+.player-name {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.player-status {
+  color: #c5cae9;
+  font-size: 0.8rem;
+}
+
+/* Leaderboard Styles */
+.leaderboard-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #253553;
+  padding-bottom: 8px;
+}
+
+.leaderboard-tabs .btn {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+}
+
+.leaderboard-tabs .btn.active {
+  background: #7986cb;
+  color: #fff;
+}
+
+.leaderboard-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.leaderboard-entry {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #1a237e, #3949ab);
+  border: 1px solid #7986cb;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.leaderboard-entry:hover {
+  background: linear-gradient(135deg, #3949ab, #5c6bc0);
+  transform: translateX(4px);
+}
+
+.leaderboard-entry .rank {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ffd700;
+  min-width: 30px;
+  text-align: center;
+}
+
+.leaderboard-entry .player-name {
+  flex: 1;
+  color: #fff;
+  font-weight: 600;
+}
+
+.leaderboard-entry .score {
+  color: #81c784;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.leaderboard-entry.own-entry {
+  background: linear-gradient(135deg, #2e7d32, #4caf50);
+  border-color: #66bb6a;
+}
+
+.leaderboard-entry.own-entry .rank {
+  color: #fff;
+}
+
+/* Chat System */
+.chat-panel {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 300px;
+  background: linear-gradient(135deg, #1a237e, #3949ab);
+  border: 2px solid #7986cb;
+  border-radius: 12px;
+  padding: 16px;
+  z-index: 1000;
+}
+
+.chat-messages {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+}
+
+.chat-message {
+  padding: 4px 8px;
+  margin-bottom: 4px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.chat-message.own {
+  background: rgba(76, 175, 80, 0.3);
+  color: #c8e6c9;
+}
+
+.chat-message.other {
+  background: rgba(33, 150, 243, 0.3);
+  color: #bbdefb;
+}
+
+.chat-input {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #7986cb;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.chat-input input::placeholder {
+  color: #c5cae9;
+}
+
+.chat-input button {
+  padding: 8px 12px;
+  background: #7986cb;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.chat-input button:hover {
+  background: #5c6bc0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .game-modes {
+    flex-direction: column;
+  }
+  
+  .room-code-value {
+    font-size: 1.5rem;
+  }
+  
+  .chat-panel {
+    width: calc(100vw - 40px);
+    left: 20px;
+    right: 20px;
+  }
+  
+  .leaderboard-tabs {
+    flex-wrap: wrap;
+  }
+}

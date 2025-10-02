@@ -45,7 +45,24 @@
         </ul>
       </div>
 
-      <button id="btnStartGame" class="btn primary large" onclick="console.log('Button clicked!'); if(window.startGame) window.startGame(); else alert('startGame not found!');">Start Game</button>
+      <div class="game-modes">
+        <button id="btnStartGame" class="btn primary large" onclick="console.log('Button clicked!'); if(window.startGame) window.startGame(); else alert('startGame not found!');">Start Single Player</button>
+        <button id="btnCreateRoom" class="btn success large" onclick="if(window.createRoom) window.createRoom(); else alert('createRoom not found!');">Create Online Room</button>
+        <button id="btnJoinRoom" class="btn warning large" onclick="if(window.joinRoom) window.joinRoom(); else alert('joinRoom not found!');">Join Online Room</button>
+      </div>
+      
+      <!-- Room Code Display -->
+      <div id="roomCode" class="room-code hidden">
+        <h3>Room Code</h3>
+        <div id="roomCodeValue" class="room-code-value"></div>
+        <button id="btnCopyRoomCode" class="btn ghost">Copy Code</button>
+      </div>
+      
+      <!-- Online Players Display -->
+      <div id="onlinePlayers" class="online-players hidden">
+        <h3>Online Players</h3>
+        <div id="playersList" class="players-list"></div>
+      </div>
     </div>
   </div>
 
@@ -120,9 +137,29 @@
     <div id="log" class="log"></div>
   </div>
 
+  <!-- Leaderboard Panel -->
+  <div id="leaderboardPanel" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="leaderboardTitle">
+    <div class="panel">
+      <div class="row between">
+        <h2 id="leaderboardTitle">Leaderboards</h2>
+        <button class="btn ghost" onclick="document.getElementById('leaderboardPanel').classList.add('hidden')">Close ✕</button>
+      </div>
+      <div class="leaderboard-tabs">
+        <button class="btn ghost active" data-leaderboard="overall">Overall</button>
+        <button class="btn ghost" data-leaderboard="weekly">Weekly</button>
+        <button class="btn ghost" data-leaderboard="daily">Daily</button>
+        <button class="btn ghost" data-leaderboard="bosses">Bosses</button>
+      </div>
+      <div id="leaderboard" class="leaderboard-list"></div>
+    </div>
+  </div>
+
   <!-- Toast notifications -->
   <div id="toast" class="toast"></div>
 
+  <!-- Socket.IO for online multiplayer -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  
   <script type="module" src="./js/boot.js"></script>
   
   <!-- Emergency button fix script -->

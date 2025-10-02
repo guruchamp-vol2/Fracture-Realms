@@ -7,6 +7,9 @@ import { Input } from './modules/input.js';
 
 // Enhanced systems - re-enabling one by one to test
 import { AchievementSystem } from './modules/achievements.js';
+import { MobSystem } from './modules/mobs.js';
+import { StageSystem } from './modules/stages.js';
+import { OnlineMultiplayerSystem, OnlineLeaderboardSystem } from './modules/online_multiplayer.js';
 // import { ParticleSystem } from './modules/particles.js';
 // import { PowerUpSystem } from './modules/powerups.js';
 // import { WeaponSystem } from './modules/weapons.js';
@@ -197,6 +200,10 @@ export class Game {
     
     // Enhanced Systems - re-enabling one by one
     this.achievements = new AchievementSystem(this);
+    this.mobSystem = new MobSystem(this);
+    this.stageSystem = new StageSystem(this);
+    this.onlineMultiplayer = new OnlineMultiplayerSystem(this);
+    this.onlineLeaderboard = new OnlineLeaderboardSystem(this);
     // this.particleSystem = new ParticleSystem(this);
     // this.powerUpSystem = new PowerUpSystem(this);
     // this.weaponSystem = new WeaponSystem(this);
@@ -642,6 +649,9 @@ export class Game {
     
     // Update enhanced systems - re-enabling one by one
     this.achievements?.checkAchievements();
+    this.mobSystem?.update(dt2);
+    this.stageSystem?.update(dt2);
+    this.onlineMultiplayer?.update(dt2);
     // this.particleSystem?.update(dt2);
     // this.powerUpSystem?.update(dt2);
     // this.weaponSystem?.update(dt2);
@@ -849,8 +859,10 @@ export class Game {
     ctx.fillStyle='#64b5f6'; ctx.fillRect(0,0,W,H);
     ctx.restore();
     
-    // Render enhanced systems - temporarily disabled
-    // TODO: Re-enable these once basic game is working
+    // Render enhanced systems - re-enabling one by one
+    this.mobSystem?.render(ctx);
+    this.stageSystem?.render(ctx);
+    this.onlineMultiplayer?.render(ctx);
     // this.particleSystem?.render(ctx);
     // this.powerUpSystem?.render(ctx);
     // this.weaponSystem?.render(ctx);
