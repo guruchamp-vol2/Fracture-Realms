@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fracture Realms - Test</title>
+    <style>
+        body { margin: 0; padding: 20px; background: #1a1a2e; color: white; font-family: Arial, sans-serif; }
+        #game { border: 2px solid #4a4a4a; background: #0f0f23; }
+        .status { margin: 10px 0; padding: 10px; background: #2a2a4e; border-radius: 5px; }
+        .error { background: #4a1a1a; color: #ff6b6b; }
+        .success { background: #1a4a1a; color: #6bff6b; }
+    </style>
+</head>
+<body>
+    <h1>🎮 Fracture Realms - Test Mode</h1>
+    <div id="status" class="status">Loading game...</div>
+    <canvas id="game" width="800" height="600"></canvas>
+    
+    <script type="module">
+        const status = document.getElementById('status');
+        
+        try {
+            status.textContent = 'Importing game modules...';
+            const { Game } = await import('./js/game.js');
+            
+            status.textContent = 'Creating game instance...';
+            const game = new Game();
+            
+            status.textContent = 'Game loaded successfully! ✅';
+            status.className = 'status success';
+            
+            // Make game globally accessible for debugging
+            window.game = game;
+            
+        } catch (error) {
+            status.textContent = `Error: ${error.message}`;
+            status.className = 'status error';
+            console.error('Game loading error:', error);
+        }
+    </script>
+</body>
+</html>

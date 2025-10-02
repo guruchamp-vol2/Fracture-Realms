@@ -556,8 +556,7 @@ export class SaveSystem {
   }
 }
 
-// CSS for save system (to be added to styles.css)
-export const saveStyles = `
+// Save system is now ready to use
 .save-load-panel {
   width: min(900px, 95vw);
   max-height: 90vh;

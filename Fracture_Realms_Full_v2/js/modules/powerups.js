@@ -518,48 +518,4 @@ class PowerUpPickup {
   }
 }
 
-// CSS for power-up notifications (to be added to styles.css)
-export const powerUpStyles = `
-.powerup-notification {
-  position: fixed;
-  top: 120px;
-  left: -300px;
-  width: 250px;
-  background: linear-gradient(135deg, #1a237e, #3949ab);
-  border: 2px solid #7986cb;
-  border-radius: 12px;
-  padding: 12px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
-  z-index: 1000;
-  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.powerup-notification.show {
-  left: 16px;
-}
-
-.powerup-icon {
-  font-size: 2rem;
-  flex-shrink: 0;
-}
-
-.powerup-text {
-  flex: 1;
-}
-
-.powerup-name {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 2px;
-}
-
-.powerup-desc {
-  font-size: 0.8rem;
-  color: #c5cae9;
-  line-height: 1.2;
-}
-`;
+// Power-up system is now ready to use

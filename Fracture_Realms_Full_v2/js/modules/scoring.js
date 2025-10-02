@@ -419,27 +419,4 @@ export class LeaderboardSystem {
   }
 }
 
-// CSS for score popups (to be added to styles.css)
-export const scoringStyles = `
-.score-popup {
-  position: fixed;
-  font-weight: bold;
-  font-size: 16px;
-  z-index: 999;
-  pointer-events: none;
-  opacity: 0;
-  transform: translateY(0px);
-  transition: all 0.5s ease-out;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-.score-popup.show {
-  opacity: 1;
-  transform: translateY(-40px);
-}
-
-.score-popup.fade {
-  opacity: 0;
-  transform: translateY(-80px);
-}
-`;
+// Scoring system is now ready to use
