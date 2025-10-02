@@ -22,12 +22,20 @@ function startGame() {
   const hudEl = document.getElementById('hud');
   if (hudEl) {
     hudEl.style.display = 'flex';
+    hudEl.classList.remove('hidden');
+    console.log('✓ HUD shown');
+  } else {
+    console.error('❌ HUD element not found!');
   }
   
   // Show log
   const logEl = document.getElementById('logWrap');
   if (logEl) {
     logEl.style.display = 'block';
+    logEl.classList.remove('hidden');
+    console.log('✓ Log shown');
+  } else {
+    console.error('❌ Log element not found!');
   }
 
   const canvas = document.getElementById('game');

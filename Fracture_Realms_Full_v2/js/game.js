@@ -39,10 +39,11 @@ class Platform extends Rect {
   draw(ctx){
     if(this.dead) return;
     const k=clamp(this.stand/this.breakAt,0,1);
-    ctx.fillStyle=`hsl(${lerp(200,10,k)},60%,${lerp(60,45,k)}%)`;
+    // Brighter, more visible platforms
+    ctx.fillStyle=`hsl(${lerp(200,10,k)},70%,${lerp(70,50,k)}%)`;
     ctx.fillRect(this.x,this.y,this.w,this.h);
-    ctx.strokeStyle=`hsl(${lerp(210,0,k)},80%,${lerp(40,70,k)}%)`;
-    ctx.lineWidth=2;
+    ctx.strokeStyle=`hsl(${lerp(210,0,k)},90%,${lerp(60,75,k)}%)`;
+    ctx.lineWidth=3;
     ctx.beginPath();
     for(let i=0;i<3;i++){
       const px=this.x+this.w*(i+1)/4;
@@ -55,7 +56,7 @@ class Platform extends Rect {
 class Player {
   constructor(id, x, y, input){
     this.id=id; this.pos={x,y}; this.vel={x:0,y:0};
-    this.w=34; this.h=48;
+    this.w=48; this.h=64;
     this.onGround=false; this.jumps=2; this.facing=1;
     this.dashCD=0; this.dashCharges=1; this.maxDash=1;
     this.hp=100; this.iframes=0;
@@ -752,7 +753,11 @@ export class Game {
     if(this.enemies.length<4 && (!this.boss || this.boss.hp<this.boss.maxHP*0.5)) this.spawnWave(1);
     if(!this.boss && this.shardCount>=10 && Math.random()<0.005) this.spawnBoss();
 
-    if(this.players[0].hp<=0){ this.log('You died. Press Restart Realm.','danger'); this.togglePause(true); }
+    if(this.players[0].hp<=0 && this.players[0].alive){ 
+      this.players[0].alive=false;
+      this.log('💀 You died! Use Restart Realm or Return to Menu.','danger'); 
+      this.togglePause(true); 
+    }
   }
 
   pulseTo(target){
@@ -776,7 +781,12 @@ export class Game {
   draw(){
     const ctx=this.ctx,W=this.W,H=this.H;
     ctx.clearRect(0,0,W,H);
-    const g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#0b0f17'); g.addColorStop(1,'#091322'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    // Lighter, more visible background
+    const g=ctx.createLinearGradient(0,0,0,H); 
+    g.addColorStop(0,'#1a2332'); 
+    g.addColorStop(1,'#0f1823'); 
+    ctx.fillStyle=g; 
+    ctx.fillRect(0,0,W,H);
     // subtle warp overlay
     ctx.save();
     ctx.globalAlpha = Math.min(0.5, Math.abs(this.timeScale-1)*0.7);
@@ -821,10 +831,28 @@ export class Game {
 
     ctx.restore();
 
-    // HP
+    // HP bar at bottom
     const p0=this.players[0];
-    this.ctx.fillStyle='#e6f0ff';
-    this.ctx.fillText(`HP: ${Math.max(0,p0.hp|0)}`, 12, this.H-12);
+    const hpBarW = 200;
+    const hpBarH = 24;
+    const hpBarX = 12;
+    const hpBarY = this.H - 40;
+    
+    // HP bar background
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(hpBarX, hpBarY, hpBarW, hpBarH);
+    
+    // HP bar fill
+    const hpPercent = Math.max(0, p0.hp) / 100;
+    const hpColor = hpPercent > 0.5 ? '#66bb6a' : hpPercent > 0.25 ? '#ffb74d' : '#ef5350';
+    ctx.fillStyle = hpColor;
+    ctx.fillRect(hpBarX + 2, hpBarY + 2, (hpBarW - 4) * hpPercent, hpBarH - 4);
+    
+    // HP text
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(`HP: ${Math.max(0, p0.hp|0)} / 100`, hpBarX + hpBarW/2, hpBarY + 17);
   }
 
   // --- realm control ---
