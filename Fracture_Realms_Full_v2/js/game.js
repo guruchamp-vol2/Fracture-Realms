@@ -4,18 +4,21 @@ import { AudioBus } from './sound.js';
 import { makeBosses } from './modules/bosses.js';
 import { makeRealms } from './modules/realms.js';
 import { Input } from './modules/input.js';
-import { AchievementSystem } from './modules/achievements.js';
-import { ParticleSystem } from './modules/particles.js';
-import { PowerUpSystem } from './modules/powerups.js';
-import { WeaponSystem } from './modules/weapons.js';
-import { ScoringSystem, LeaderboardSystem } from './modules/scoring.js';
-import { SettingsSystem } from './modules/settings.js';
-import { MultiplayerSystem } from './modules/multiplayer.js';
-import { DifficultySystem } from './modules/difficulty.js';
-import { StorySystem } from './modules/story.js';
-import { CustomizationSystem } from './modules/customization.js';
-import { MiniGameSystem } from './modules/minigames.js';
-import { SaveSystem } from './modules/save.js';
+
+// Enhanced systems - temporarily disabled to fix startup issues
+// TODO: Re-enable these modules once basic game is working
+// import { AchievementSystem } from './modules/achievements.js';
+// import { ParticleSystem } from './modules/particles.js';
+// import { PowerUpSystem } from './modules/powerups.js';
+// import { WeaponSystem } from './modules/weapons.js';
+// import { ScoringSystem, LeaderboardSystem } from './modules/scoring.js';
+// import { SettingsSystem } from './modules/settings.js';
+// import { MultiplayerSystem } from './modules/multiplayer.js';
+// import { DifficultySystem } from './modules/difficulty.js';
+// import { StorySystem } from './modules/story.js';
+// import { CustomizationSystem } from './modules/customization.js';
+// import { MiniGameSystem } from './modules/minigames.js';
+// import { SaveSystem } from './modules/save.js';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const lerp=(a,b,t)=>a+(b-a)*t;
@@ -193,20 +196,21 @@ export class Game {
     this.audio = new AudioBus();
     this.input = new Input();
     
-    // Enhanced Systems
-    this.achievements = new AchievementSystem(this);
-    this.particleSystem = new ParticleSystem(this);
-    this.powerUpSystem = new PowerUpSystem(this);
-    this.weaponSystem = new WeaponSystem(this);
-    this.scoringSystem = new ScoringSystem(this);
-    this.leaderboardSystem = new LeaderboardSystem();
-    this.settings = new SettingsSystem(this);
-    this.multiplayer = new MultiplayerSystem(this);
-    this.difficulty = new DifficultySystem(this);
-    this.story = new StorySystem(this);
-    this.customization = new CustomizationSystem(this);
-    this.miniGames = new MiniGameSystem(this);
-    this.saveSystem = new SaveSystem(this);
+    // Enhanced Systems - temporarily disabled
+    // TODO: Re-enable these once basic game is working
+    // this.achievements = new AchievementSystem(this);
+    // this.particleSystem = new ParticleSystem(this);
+    // this.powerUpSystem = new PowerUpSystem(this);
+    // this.weaponSystem = new WeaponSystem(this);
+    // this.scoringSystem = new ScoringSystem(this);
+    // this.leaderboardSystem = new LeaderboardSystem();
+    // this.settings = new SettingsSystem(this);
+    // this.multiplayer = new MultiplayerSystem(this);
+    // this.difficulty = new DifficultySystem(this);
+    // this.story = new StorySystem(this);
+    // this.customization = new CustomizationSystem(this);
+    // this.miniGames = new MiniGameSystem(this);
+    // this.saveSystem = new SaveSystem(this);
 
     // Options/runtime
     this.screenShake=true; this.particlesOn=true; this.assist=false;
@@ -638,15 +642,16 @@ export class Game {
     }
     const t=performance.now()/1000; const dt2=dt*this.timeScale;
     
-    // Update enhanced systems
-    this.achievements?.checkAchievements();
-    this.particleSystem?.update(dt2);
-    this.powerUpSystem?.update(dt2);
-    this.weaponSystem?.update(dt2);
-    this.scoringSystem?.update(dt2);
-    this.multiplayer?.update(dt2);
-    this.difficulty?.updateAdaptiveDifficulty(dt2);
-    this.saveSystem?.updateAutoSave(dt2);
+    // Update enhanced systems - temporarily disabled
+    // TODO: Re-enable these once basic game is working
+    // this.achievements?.checkAchievements();
+    // this.particleSystem?.update(dt2);
+    // this.powerUpSystem?.update(dt2);
+    // this.weaponSystem?.update(dt2);
+    // this.scoringSystem?.update(dt2);
+    // this.multiplayer?.update(dt2);
+    // this.difficulty?.updateAdaptiveDifficulty(dt2);
+    // this.saveSystem?.updateAutoSave(dt2);
 
     // UI chips
     this.ui.chipGrav && (this.ui.chipGrav.textContent=`Gravity: ${this.gravDir>0?'↓':'↑'}`);
@@ -847,16 +852,17 @@ export class Game {
     ctx.fillStyle='#64b5f6'; ctx.fillRect(0,0,W,H);
     ctx.restore();
     
-    // Render enhanced systems
-    this.particleSystem?.render(ctx);
-    this.powerUpSystem?.render(ctx);
-    this.weaponSystem?.render(ctx);
-    this.scoringSystem?.renderScoreUI(ctx);
-    this.multiplayer?.renderMultiplayerUI(ctx);
-    this.difficulty?.renderDifficultyUI(ctx);
-    this.story?.renderStoryUI(ctx);
-    this.customization?.renderCustomizationUI(ctx);
-    this.miniGames?.renderMiniGameUI(ctx);
+    // Render enhanced systems - temporarily disabled
+    // TODO: Re-enable these once basic game is working
+    // this.particleSystem?.render(ctx);
+    // this.powerUpSystem?.render(ctx);
+    // this.weaponSystem?.render(ctx);
+    // this.scoringSystem?.renderScoreUI(ctx);
+    // this.multiplayer?.renderMultiplayerUI(ctx);
+    // this.difficulty?.renderDifficultyUI(ctx);
+    // this.story?.renderStoryUI(ctx);
+    // this.customization?.renderCustomizationUI(ctx);
+    // this.miniGames?.renderMiniGameUI(ctx);
 
     const cs=this.cameraShake||{x:0,y:0}; ctx.save(); ctx.translate(cs.x,cs.y);
 
