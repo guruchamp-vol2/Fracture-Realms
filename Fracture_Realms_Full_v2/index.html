@@ -45,7 +45,7 @@
         </ul>
       </div>
 
-      <button id="btnStartGame" class="btn primary large" onclick="console.log('Inline onclick fired!')">Start Game</button>
+      <button id="btnStartGame" class="btn primary large" onclick="console.log('Button clicked!'); if(window.startGame) window.startGame(); else alert('startGame not found!');">Start Game</button>
     </div>
   </div>
 

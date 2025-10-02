@@ -6,53 +6,64 @@ import { SceneManager } from './scene_manager.js';
 let sceneManager;
 let game;
 
+function startGame() {
+  console.log('=== STARTING GAME ===');
+  
+  // Enable canvas display
+  document.body.classList.add('game-active');
+  
+  // Hide menu scene
+  const menuEl = document.getElementById('menu');
+  if (menuEl) {
+    menuEl.style.display = 'none';
+  }
+  
+  // Show HUD
+  const hudEl = document.getElementById('hud');
+  if (hudEl) {
+    hudEl.style.display = 'flex';
+  }
+  
+  // Show log
+  const logEl = document.getElementById('logWrap');
+  if (logEl) {
+    logEl.style.display = 'block';
+  }
+
+  const canvas = document.getElementById('game');
+  game = new Game(canvas, { mode: 'campaign' });
+  window.game = game;
+  
+  // Hotkeys
+  window.addEventListener('keydown', (e) => {
+    const k = e.key.toLowerCase();
+    if (k === 'p' && game) game.togglePause();
+    if (k === 'u' && game) game.toggleUp();
+  });
+  
+  console.log('=== GAME STARTED ===');
+}
+
 function start() {
+  console.log('Boot script starting...');
+  
   sceneManager = new SceneManager();
   sceneManager.show('menu');
 
   // Wait for user to click Start Game
   const startBtn = document.getElementById('btnStartGame');
-  console.log('Start button found:', startBtn);
+  console.log('Start button:', startBtn);
   
   if (startBtn) {
-    startBtn.addEventListener('click', () => {
-      console.log('Start Game clicked!');
-      
-      // Enable canvas pointer events
-      document.body.classList.add('game-active');
-      
-      // Hide menu scene
-      const menuEl = document.getElementById('menu');
-      if (menuEl) {
-        menuEl.classList.add('hidden');
-        menuEl.classList.remove('active');
-      }
-      
-      // Show HUD
-      const hudEl = document.getElementById('hud');
-      if (hudEl) {
-        hudEl.classList.remove('hidden');
-      }
-      
-      // Show log
-      const logEl = document.getElementById('logWrap');
-      if (logEl) {
-        logEl.classList.remove('hidden');
-      }
-
-      const canvas = document.getElementById('game');
-      game = new Game(canvas, { mode: 'campaign' });
-      window.game = game;
-      
-      // Hotkeys
-      addEventListener('keydown', (e) => {
-        const k = e.key.toLowerCase();
-        if (k === 'p') game.togglePause();
-        if (k === 'u') game.toggleUp();
-      });
-    }, { once: true }); // Only fire once
+    // Remove any existing listeners
+    const newBtn = startBtn.cloneNode(true);
+    startBtn.parentNode.replaceChild(newBtn, startBtn);
+    
+    // Add fresh listener
+    newBtn.addEventListener('click', startGame);
+    console.log('Start button listener attached');
   } else {
-    console.error('Start button not found!');
+    console.error('❌ Start button NOT found!');
   }
   
   // Clear log button
@@ -65,16 +76,12 @@ function start() {
   }
 }
 
-addEventListener('DOMContentLoaded', () => {
-  console.log('DOM Content Loaded');
-  console.log('Document ready state:', document.readyState);
-  start();
-});
+// Make startGame globally accessible for inline onclick
+window.startGame = startGame;
 
-// Also try immediate execution in case DOMContentLoaded already fired
+// Wait for DOM
 if (document.readyState === 'loading') {
-  console.log('Document still loading, waiting for DOMContentLoaded');
+  document.addEventListener('DOMContentLoaded', start);
 } else {
-  console.log('Document already loaded, starting immediately');
   start();
 }

@@ -110,15 +110,18 @@ export class Game {
 
     // Buttons with proper event handling
     if (this.ui.btnPause) {
-      console.log('Pause button found:', this.ui.btnPause);
-      this.ui.btnPause.addEventListener('click', (e) => {
-        console.log('Pause button clicked!');
-        e.preventDefault();
-        e.stopPropagation();
+      console.log('✓ Pause button found');
+      // Clone to remove any existing listeners
+      const newPauseBtn = this.ui.btnPause.cloneNode(true);
+      this.ui.btnPause.parentNode.replaceChild(newPauseBtn, this.ui.btnPause);
+      this.ui.btnPause = newPauseBtn;
+      
+      this.ui.btnPause.addEventListener('click', () => {
+        console.log('⏸ Pause clicked');
         this.togglePause();
       });
     } else {
-      console.error('Pause button NOT found!');
+      console.error('❌ Pause button NOT found');
     }
     if (this.ui.btnResume) {
       this.ui.btnResume.addEventListener('click', (e) => {

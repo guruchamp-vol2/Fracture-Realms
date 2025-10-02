@@ -25,20 +25,19 @@ html, body {
   overflow: hidden;
 }
 
-/* Canvas layer - disabled by default to allow menu clicks */
+/* Canvas layer - HIDDEN by default to allow menu clicks */
 #game {
   position: fixed;
   inset: 0;
   width: 100vw;
   height: 100vh;
-  display: block;
+  display: none;
   z-index: 0;
-  pointer-events: none;
 }
 
-/* Enable canvas pointer events when game is running */
+/* Show canvas when game is running */
 body.game-active #game {
-  pointer-events: auto;
+  display: block;
 }
 
 /* Scene management */
