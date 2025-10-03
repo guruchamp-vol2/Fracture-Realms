@@ -21,7 +21,7 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB connection for Render deployment
-const mongoUri = process.env.MONGODB_URI || process.env.MONGODB_CONNECTION_STRING || 'mongodb://localhost:27017/fracture-realms';
+const mongoUri = process.env.MONGODB_URI || process.env.MONGODB_CONNECTION_STRING || 'mongodb+srv://Render:xAJCwMt3B6oxcc6u@cluster0.j6tpgoj.mongodb.net/fracture-realms?retryWrites=true&w=majority&appName=Cluster0';
 
 mongoose.connect(mongoUri, {
   useNewUrlParser: true,
