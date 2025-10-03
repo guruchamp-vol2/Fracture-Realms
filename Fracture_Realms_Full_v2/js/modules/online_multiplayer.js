@@ -86,6 +86,35 @@ export class OnlineMultiplayerSystem {
     throw lastError || new Error('All multiplayer servers unreachable');
   }
 
+  // Optional UI bindings; safe no-op if elements are missing
+  setupEventHandlers() {
+    try {
+      const createBtn = document.getElementById('btnCreateRoom');
+      const joinBtn = document.getElementById('btnJoinRoom');
+      if (createBtn) {
+        // Avoid multiple listeners
+        const clone = createBtn.cloneNode(true);
+        createBtn.parentNode.replaceChild(clone, createBtn);
+        clone.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (this.connectionState === 'connecting') return;
+          this.connect(null);
+        });
+      }
+      if (joinBtn) {
+        const clone = joinBtn.cloneNode(true);
+        joinBtn.parentNode.replaceChild(clone, joinBtn);
+        clone.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (this.connectionState === 'connecting') return;
+          const code = prompt('Enter Room Code');
+          if (!code) return;
+          this.connect(code.trim());
+        });
+      }
+    } catch {}
+  }
+
   setupSocketHandlers() {
     this.socket.on('connect', () => {
       console.log('Connected to multiplayer server');
