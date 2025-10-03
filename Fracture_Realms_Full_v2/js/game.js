@@ -140,6 +140,7 @@ export class Game {
         this.togglePause();
       });
     } else {
+      // Fallback: wire up via inline onclick in HTML already
       console.error('❌ Pause button NOT found');
     }
     if (this.ui.btnResume) {

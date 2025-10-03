@@ -81,6 +81,19 @@ export class AdaptiveDifficultySystem {
     this.initializeTracking();
   }
 
+  // Main per-frame update hook
+  update(dt) {
+    try {
+      // Keep short-interval metrics flowing
+      this.updatePerformanceMetrics();
+      // Periodically evaluate difficulty
+      this.checkDifficultyAdjustment();
+    } catch (e) {
+      // Never let adaptive difficulty crash the game loop
+      console.warn('AdaptiveDifficulty update error:', e?.message||e);
+    }
+  }
+
   initializeTracking() {
     // Set up event listeners for performance tracking
     this.setupEventListeners();
