@@ -12,7 +12,11 @@ export class OnlineMultiplayerSystem {
     this.isConnected = false;
     this.connectionState = 'disconnected';
     
-    this.serverUrl = 'https://fracture-realms-server.onrender.com'; // Your Render deployment URL
+    // Prefer same-origin server if available, fall back to dedicated server
+    const sameOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+    const dedicated = 'https://fracture-realms-server.onrender.com';
+    this.serverCandidates = [sameOrigin, dedicated].filter(Boolean);
+    this.serverUrl = this.serverCandidates[0];
     this.iceServers = [
       { urls: 'stun:stun.l.google.com:19302' },
       { urls: 'stun:stun1.l.google.com:19302' }
@@ -28,8 +32,8 @@ export class OnlineMultiplayerSystem {
     try {
       this.connectionState = 'connecting';
       
-      // Connect to signaling server
-      this.socket = io(this.serverUrl);
+      // Try candidates until one connects
+      await this.tryConnectCandidates();
       
       // Generate player ID
       this.playerId = this.generatePlayerId();
@@ -49,6 +53,37 @@ export class OnlineMultiplayerSystem {
       console.error('Failed to connect to multiplayer server:', error);
       this.connectionState = 'error';
     }
+  }
+
+  async tryConnectCandidates() {
+    let lastError = null;
+    for (const url of this.serverCandidates) {
+      try {
+        await new Promise((resolve, reject) => {
+          const socket = io(url, { transports: ['websocket', 'polling'], path: '/socket.io' });
+          let settled = false;
+          const onConnect = () => { if (!settled) { settled = true; cleanup(); this.socket = socket; resolve(); } };
+          const onError = (err) => { if (!settled) { settled = true; cleanup(); socket.close(); reject(err||new Error('connect_error')); } };
+          const cleanup = () => {
+            socket.off('connect', onConnect);
+            socket.off('connect_error', onError);
+            socket.off('error', onError);
+          };
+          socket.on('connect', onConnect);
+          socket.on('connect_error', onError);
+          socket.on('error', onError);
+          // Failsafe timeout
+          setTimeout(() => onError(new Error('connect_timeout')), 6000);
+        });
+        this.serverUrl = url;
+        console.log('Connected to multiplayer server:', url);
+        return;
+      } catch (e) {
+        lastError = e;
+        console.warn('Multiplayer connect failed for', url, e?.message||e);
+      }
+    }
+    throw lastError || new Error('All multiplayer servers unreachable');
   }
 
   setupSocketHandlers() {
@@ -391,17 +426,26 @@ export class OnlineMultiplayerSystem {
 
   showRoomCode(roomId) {
     // Show room code to host
-    const roomCodeElement = document.getElementById('roomCode');
-    if (roomCodeElement) {
-      roomCodeElement.textContent = `Room Code: ${roomId}`;
-      roomCodeElement.style.display = 'block';
+    const container = document.getElementById('roomCode');
+    const valueEl = document.getElementById('roomCodeValue');
+    if (valueEl) valueEl.textContent = roomId;
+    if (container) {
+      container.classList.remove('hidden');
+      container.style.display = 'block';
+    }
+    const copyBtn = document.getElementById('btnCopyRoomCode');
+    if (copyBtn) {
+      copyBtn.onclick = async () => {
+        try { await navigator.clipboard.writeText(roomId); } catch {}
+      };
     }
   }
 
   hideRoomCode() {
-    const roomCodeElement = document.getElementById('roomCode');
-    if (roomCodeElement) {
-      roomCodeElement.style.display = 'none';
+    const container = document.getElementById('roomCode');
+    if (container) {
+      container.style.display = 'none';
+      container.classList.add('hidden');
     }
   }
 

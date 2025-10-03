@@ -38,6 +38,14 @@ function startGame() {
   game = new Game(canvas, { mode: 'campaign' });
   window.game = game;
   
+  // Ensure an arena is present on first start
+  try {
+    if (game && (!game.platforms || game.platforms.length === 0)) {
+      game.addArena();
+      game.spawnWave(3);
+    }
+  } catch {}
+  
   // Hotkeys
   window.addEventListener('keydown', (e) => {
     const k = e.key.toLowerCase();
