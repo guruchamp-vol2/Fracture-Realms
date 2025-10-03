@@ -48,6 +48,45 @@ function startGame() {
   console.log('=== GAME STARTED ===');
 }
 
+// Create an online room (host). Ensures the game is started first
+function createRoom() {
+  try {
+    if (!game) startGame();
+    // Defer connect to ensure systems are ready
+    setTimeout(() => {
+      const multiplayer = game?.onlineMultiplayer;
+      if (!multiplayer) {
+        alert('Online multiplayer system not available');
+        return;
+      }
+      multiplayer.connect(null); // create-room flow
+    }, 0);
+  } catch (err) {
+    console.error('Failed to create room:', err);
+    alert('Failed to create room');
+  }
+}
+
+// Join an existing online room by code
+function joinRoom() {
+  try {
+    const roomId = prompt('Enter Room Code');
+    if (!roomId) return;
+    if (!game) startGame();
+    setTimeout(() => {
+      const multiplayer = game?.onlineMultiplayer;
+      if (!multiplayer) {
+        alert('Online multiplayer system not available');
+        return;
+      }
+      multiplayer.connect(roomId.trim());
+    }, 0);
+  } catch (err) {
+    console.error('Failed to join room:', err);
+    alert('Failed to join room');
+  }
+}
+
 function start() {
   console.log('Boot script starting...');
   
@@ -82,6 +121,8 @@ function start() {
 
 // Make startGame globally accessible for inline onclick
 window.startGame = startGame;
+window.createRoom = createRoom;
+window.joinRoom = joinRoom;
 
 // Wait for DOM
 if (document.readyState === 'loading') {
